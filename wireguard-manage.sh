@@ -133,8 +133,16 @@ do
             IP_SUFFIX=$1
             #
             if [ -z "${IP_SUFFIX}" ]; then
-                IP_SUFFIX=`grep '##' ${SERVER_CONF_FILE} | tail -n 1 | cut -d ' ' -f 3 | cut -d '.' -f 4` 
+                IP_SUFFIX=`grep '##' ${SERVER_CONF_FILE} | tail -n 1 | cut -d ' ' -f 3 | cut -d '.' -f 4`
                 let IP_SUFFIX=${IP_SUFFIX}+1
+            else
+                grep '##' ${SERVER_CONF_FILE} | grep "${IP_SUFFIX}" | cut -d ' ' -f 3 | cut -d '.' -f 4 | grep "${IP_SUFFIX}" > /tmp/${SH_NAME}-search-ip.list
+                while read LINE; do
+                    if [ "x${LINE}" = "x${IP_SUFFIX}" ]; then
+                        echo -e "\n峰哥说：IP尾号【${IP_SUFFIX}】已经存在，请换一个！\n"
+                        exit 1
+                    fi
+                done < /tmp/${SH_NAME}-search-ip.list
             fi
             USER_IP=${IP_PREFIX}.${IP_SUFFIX}
             #
@@ -151,6 +159,7 @@ do
             USER_PUBKEY=`cat ${USER_CONFIG_PATH}/${USER_NAME}.pub | head -n 1`
             #
             F_SERVER_CONF >> ${SERVER_CONF_FILE}
+            echo
             echo "用户端配置信息："
             echo '------------------------------'
             F_USER_CONF | tee ${USER_CONFIG_PATH}/${USER_NAME}.conf.out
@@ -158,6 +167,7 @@ do
             echo "OK"
             echo "服务器端：reload后才会生效"
             echo "用户端  ：请将上面【用户端配置信息】给到用户"
+            echo
             #
             exit
             ;;
