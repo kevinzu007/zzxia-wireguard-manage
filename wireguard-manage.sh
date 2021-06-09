@@ -28,8 +28,9 @@ F_HELP()
     用途：用于wireguard的用户管理
     依赖：${SH_PATH}/env.sh
     注意：
-        1、请先确保你的wireguard服务器已经正常运行
+        1、如果使用参数【-R|--reload】，请确保你的wireguard服务器已经在本地安装配置完成
         2、修改环境变量文件【${SH_PATH}/env.sh】
+        3、如果本程序运行在非wireguard服务器上，可以将服务器配置文件指到任意你想要的位置（修改${SH_PATH}/env.sh 中 SERVER_CONF_FILE 变量的值即可）
     用法：
         $0  [-h|--help]
         $0  [-l|--list]
@@ -158,6 +159,10 @@ do
             USER_PRIVATEKEY=`cat ${USER_CONFIG_PATH}/${USER_NAME}.key | head -n 1`
             USER_PUBKEY=`cat ${USER_CONFIG_PATH}/${USER_NAME}.pub | head -n 1`
             #
+            echo "服务器端将会添加以下配置信息："
+            echo '------------------------------'
+            F_SERVER_CONF
+            echo '------------------------------'
             F_SERVER_CONF >> ${SERVER_CONF_FILE}
             echo
             echo "用户端配置信息："
