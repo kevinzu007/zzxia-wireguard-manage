@@ -184,7 +184,7 @@ do
                 exit 1
             fi
             #
-            sed -i '/^## ${USER_NAME}/,/^ *$/d' ${SERVER_CONF_FILE}
+            sed -i "/^## ${USER_NAME}/,/^ *$/d" ${SERVER_CONF_FILE}
             rm -f  ${USER_CONFIG_PATH}/${USER_NAME}.*
             echo "OK，你需要reload服务器才能生效"
             exit
