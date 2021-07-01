@@ -179,13 +179,14 @@ do
         -r|--rm)
             USER_NAME=$2
             shift 2
+            # 删除${USER_CONFIG_PATH}目录下用户信息
+            rm -f  ${USER_CONFIG_PATH}/${USER_NAME}.*
+            # 删除wgN.conf中的配置
             if [ `grep -q "## ${USER_NAME}" ${SERVER_CONF_FILE}; echo $?` -ne 0 ]; then
                 echo -e "\n峰哥说：用户【${USER_NAME}】不存在\n"
                 exit 1
             fi
-            #
             sed -i "/^## ${USER_NAME}/,/^ *$/d" ${SERVER_CONF_FILE}
-            rm -f  ${USER_CONFIG_PATH}/${USER_NAME}.*
             echo "OK，你需要reload服务器才能生效"
             exit
             ;;
@@ -198,7 +199,7 @@ do
             fi
             #
             echo "【${USER_NAME}】用户配置信息如下："
-            cat  ${USER_NAME}.conf.out
+            cat  ${USER_CONFIG_PATH}/${USER_NAME}.conf.out
             exit
             ;;
         -R|--reload)
