@@ -30,8 +30,9 @@ Linux shell
 ## 4 使用说明
 请使用-h|--help参数运行sh脚本即可看到使用帮助
 
-### 4.1 修改环境变量文件`env.sh`
+### 4.1 创建修改环境变量文件
 
+基于`env.sh.sample`创建环境变量文件`env.sh`，并根据自己的环境修改它：
 ```bash
 $ cat env.sh 
 #!/bin/bash
