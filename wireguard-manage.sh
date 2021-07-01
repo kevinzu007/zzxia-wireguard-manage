@@ -104,9 +104,9 @@ AllowedIPs = ${USER_ALOWED_IPs}
 
 
 
-TEMP=`getopt -o hla:r:o:R  -l help,list,add:,rm:output-config:reload -- "$@"`
+TEMP=`getopt -o hla:r:o:R  -l help,list,add:,rm:,output-config:,reload -- "$@"`
 if [ $? != 0 ]; then
-    echo "参数不合法！【请查看帮助：\$0 --help】"
+    echo "参数不合法！【请查看帮助：$0 --help】"
     exit 1
 fi
 #
@@ -132,7 +132,7 @@ do
             shift 2
             shift         #--- 去掉'--'
             IP_SUFFIX=$1
-            #
+            # 是否提供ip尾号
             if [ -z "${IP_SUFFIX}" ]; then
                 IP_SUFFIX=`grep '##' ${SERVER_CONF_FILE} | tail -n 1 | cut -d ' ' -f 3 | cut -d '.' -f 4`
                 let IP_SUFFIX=${IP_SUFFIX}+1
@@ -146,7 +146,7 @@ do
                 done < /tmp/${SH_NAME}-search-ip.list
             fi
             USER_IP=${IP_PREFIX}.${IP_SUFFIX}
-            #
+            # 用户是否已存在
             if [ `grep -q "## ${USER_NAME}" ${SERVER_CONF_FILE}; echo $?` -eq 0 ]; then
                 echo -e "\n峰哥说：用户【${USER_NAME}】已存在\n"
                 exit
@@ -213,7 +213,7 @@ do
             break
             ;;
         *)
-            echo "参数不合法！【请查看帮助：\$0 --help】"
+            echo "参数不合法！【请查看帮助：$0 --help】"
             exit 1
             ;;
     esac
