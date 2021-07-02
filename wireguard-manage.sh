@@ -154,10 +154,13 @@ do
             #
             SERVER_ALOWED_IPs="${USER_IP}/32"
             #
-            wg genkey > ${USER_CONFIG_PATH}/${USER_NAME}.key
-            wg pubkey < ${USER_CONFIG_PATH}/${USER_NAME}.key | tee ${USER_CONFIG_PATH}/${USER_NAME}.pub
-            USER_PRIVATEKEY=`cat ${USER_CONFIG_PATH}/${USER_NAME}.key | head -n 1`
-            USER_PUBKEY=`cat ${USER_CONFIG_PATH}/${USER_NAME}.pub | head -n 1`
+            #wg genkey > ${USER_CONFIG_PATH}/${USER_NAME}.key
+            #wg pubkey < ${USER_CONFIG_PATH}/${USER_NAME}.key | tee ${USER_CONFIG_PATH}/${USER_NAME}.pub
+            #USER_PRIVATEKEY=`cat ${USER_CONFIG_PATH}/${USER_NAME}.key | head -n 1`
+            #USER_PUBKEY=`cat ${USER_CONFIG_PATH}/${USER_NAME}.pub | head -n 1`
+            USER_PRIVATEKEY=`wg genkey`
+            USER_PUBKEY=`echo ${USER_PRIVATEKEY} | wg pubkey`
+            SERVER_PRE_SHARED_KEY=`wg genpsk`
             #
             echo "服务器端将会添加以下配置信息："
             echo '------------------------------'
