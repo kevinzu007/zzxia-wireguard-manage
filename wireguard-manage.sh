@@ -159,9 +159,8 @@ do
             #
             echo "服务器端配置信息："
             echo '------------------------------'
-            F_SERVER_CONF
+            F_SERVER_CONF | tee -a ${SERVER_CONF_FILE}
             echo '------------------------------'
-            F_SERVER_CONF >> ${SERVER_CONF_FILE}
             echo 'OK'
             echo
             echo "用户端配置信息："
