@@ -24,12 +24,10 @@ DATE_TIME=`date -d "${TIME}" +%Y%m%dt%H%M%S`
 CURRENT_DATE=`date -d "${TIME}" +%Y-%m-%d`
 #
 DINGDING_MARKDOWN_PY="/usr/local/bin/dingding_markdown.py"
-
-
-
 # 用户登录登记文件
-TODAY_WG_USER_FIRST_LOGIN_FILE="./wg-user-first-login-today.txt---${CURRENT_DATE}"
+TODAY_WG_USER_FIRST_LOGIN_FILE="/tmp/wg-user-first-login-today.txt---${CURRENT_DATE}"
 touch  ${TODAY_WG_USER_FIRST_LOGIN_FILE}
+
 
 
 #
@@ -59,7 +57,6 @@ do
         # 是否已记录（如果远程地址换了会怎样？）
         if [ `grep -q ${USER_XINGMING} ${TODAY_WG_USER_FIRST_LOGIN_FILE} ; echo $?` -ne 0 ]; then
             # 未记录
-            #echo "| ${TIME} | ${USER_XINGMING} | ${USER_IP} | ${USER_NET_TOTAL_MiB} | ${USER_PEER} | ${USER_PRESHARED_KEY} | ${USER_ENDPOINT_IP} | ${USER_ALLOWED_IPS} | ${USER_LATEST_HAND_TIME} | ${USER_NET_IN_MiB} | ${USER_NET_OUT_MiB} | ${USER_KEEPALIVE} |" >> ${TODAY_WG_REPORT_FILE}
             echo "| ${CURRENT_DATE} | ${USER_LATEST_HAND_TIME} | ${USER_XINGMING} | ${USER_ENDPOINT} |" >> ${TODAY_WG_USER_FIRST_LOGIN_FILE}
             #
             ${DINGDING_MARKDOWN_PY} "【Info:wg登录:`hostname -s`】" "用户：${USER_XINGMING}" "最近握手时间：${USER_LATEST_HAND_TIME}" "WG_IP：${USER_IP}" "远程IP：${USER_ENDPOINT_IP}" > /dev/null
