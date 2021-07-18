@@ -23,7 +23,7 @@ USER_CONFIG_PATH="${SH_PATH}/user_config_info"
 [ ! -d ${USER_CONFIG_PATH} ] && mkdir ${USER_CONFIG_PATH}
 #
 WG_STATUS_REPORT_FILE="/tmp/wg-status-report.list"
-
+FORMAT_TABLE_SH="${SH_PATH}/format_table.sh"
 
 
 
