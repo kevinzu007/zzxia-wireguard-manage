@@ -243,7 +243,7 @@ do
                 # 是否有握手信息
                 if [ ${USER_LATEST_HAND} -ne 0 ]; then
                     # 有握手信息
-                    echo "| ${USER_XINGMING} | ${USER_LATEST_HAND} | ${USER_NET_TOTAL_MiB} | ${USER_NET_IN_MiB} | ${USER_NET_OUT_MiB} | ${USER_IP} | ${USER_ENDPOINT_IP} | " >> ${WG_STATUS_REPORT_FILE}
+                    echo "| ${USER_XINGMING} | ${USER_LATEST_HAND_TIME} | ${USER_NET_TOTAL_MiB} | ${USER_NET_IN_MiB} | ${USER_NET_OUT_MiB} | ${USER_IP} | ${USER_ENDPOINT_IP} | " >> ${WG_STATUS_REPORT_FILE}
                 fi
             done < ${WG_STATUS_CONLLECT_FILE}
             ${FORMAT_TABLE_SH}  --delimeter '|'  --title '|姓名|最后握手时间|总流量MiB|IN流量MiB|OUT流量MiB|用户IP|远程IP|'  --file ${WG_STATUS_REPORT_FILE}
