@@ -26,11 +26,26 @@ TIME=${TIME:-`date +%Y-%m-%dT%H:%M:%S`}
 #DATE_TIME=`date -d "${TIME}" +%Y%m%dt%H%M%S`
 CURRENT_DATE=`date -d "${TIME}" +%Y-%m-%d`
 #
-DINGDING_MARKDOWN_PY="/usr/local/bin/dingding_markdown.py"
+DINGDING_MARKDOWN_PY="/usr/local/bin/dingding_by_markdown_file-login.py"
 # 用户登录登记文件
 TODAY_WG_USER_FIRST_LOGIN_FILE="/tmp/wg-user-first-login-today.txt---${CURRENT_DATE}"
 touch  ${TODAY_WG_USER_FIRST_LOGIN_FILE}
 
+
+# 钉钉
+F_SEND_DINGDING()
+{
+    ${DINGDING_MARKDOWN_PY}  \
+        --title "【Info:wg登录:`hostname -s`】"  \
+        --message "$( echo -e "### 用户：${USER_XINGMING} \n### 最近握手时间：${USER_LATEST_HAND_TIME} \n### WG_IP：${USER_IP} \n### 远程IP：${USER_ENDPOINT_IP} \n\n" )"
+}
+
+
+## 邮件
+#F_SEND_MAIL()
+#{
+#    echo -e "### 用户：${USER_XINGMING} \n### 最近握手时间：${USER_LATEST_HAND_TIME} \n### WG_IP：${USER_IP} \n### 远程IP：${USER_ENDPOINT_IP} \n\n" | mailx  -s "【wg登录:`hostname -s`}】用户：${USER_XINGMING}"  ${EMAIL}  >/dev/null 2>&1
+#}
 
 
 #
@@ -62,7 +77,7 @@ do
             # 未记录
             echo "| ${CURRENT_DATE} | ${USER_LATEST_HAND_TIME} | ${USER_XINGMING} | ${USER_ENDPOINT} |" >> ${TODAY_WG_USER_FIRST_LOGIN_FILE}
             #
-            ${DINGDING_MARKDOWN_PY} "【Info:wg登录:`hostname -s`】" "用户：${USER_XINGMING}" "最近握手时间：${USER_LATEST_HAND_TIME}" "WG_IP：${USER_IP}" "远程IP：${USER_ENDPOINT_IP}" > /dev/null
+            F_SEND_DINGDING > /dev/null
         fi
     fi
 done < ${WG_STATUS_CONLLECT_FILE}
