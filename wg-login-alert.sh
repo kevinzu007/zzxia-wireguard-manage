@@ -35,7 +35,7 @@ F_SEND_DINGDING()
 {
     ${DINGDING_MARKDOWN_PY}  \
         --title "【Info:wg登录:`hostname -s`】"  \
-        --message "$( echo -e "### 用户：${USER_XINGMING} \n### 最近握手时间：${USER_LATEST_HAND_TIME} \n### WG_IP：${USER_IP} \n### 远程IP：${USER_ENDPOINT_IP} \n\n" )"
+        --message "$( echo -e "### 用户：${USER_XINGMING} \n### 最近握手时间：${USER_LATEST_HAND_TIME} \n### WG_IP：${USER_IP} \n### 远程IP：${USER_ENDPOINT_IP} \n### 地理位置：${USER_ENDPOINT_AREA} \n\n" )"
 }
 
 
@@ -44,6 +44,22 @@ F_SEND_DINGDING()
 #{
 #    echo -e "### 用户：${USER_XINGMING} \n### 最近握手时间：${USER_LATEST_HAND_TIME} \n### WG_IP：${USER_IP} \n### 远程IP：${USER_ENDPOINT_IP} \n\n" | mailx  -s "【wg登录:`hostname -s`}】用户：${USER_XINGMING}"  ${EMAIL}  >/dev/null 2>&1
 #}
+
+
+# 获取IP位置，用法： F_IP_AREA {IP}
+F_IP_AREA()
+{
+    F_IP=$1
+    #F_AREA=` curl -s "http://apis.juhe.cn/ip/ip2addr?ip=${F_IP}&dtype=json&key=e5ad6f81997d4f101cc3d17409e18d96" | jq .result.area 2>/dev/null | sed -n 's/\"/ /gp' `
+    F_AREA=` curl -s https://api.ip.sb/geoip/${F_IP} | jq '.country,.region,.city' 2>/dev/null | sed -n 's/\"/ /gp' | awk 'NR == 1{printf "%s->",$0} NR == 2{printf "%s->",$0} NR == 3{printf     "%s\n",$0}' `
+    if [ "x${F_AREA}" = "x" -o "x${F_AREA}" = "xnull" ]; then
+        F_AREA="获取地理位置失败"
+    fi
+    F_AREA=`echo ${F_AREA} | sed 's/\"//g'`
+    echo "${F_AREA}"
+    return 0
+}
+
 
 
 #
@@ -73,8 +89,9 @@ do
         # 是否已记录（如果远程地址换了会怎样？）
         if [ `grep -q ${USER_XINGMING} ${TODAY_WG_USER_FIRST_LOGIN_FILE} ; echo $?` -ne 0 ]; then
             # 未记录
-            echo "| ${CURRENT_DATE} | ${USER_LATEST_HAND_TIME} | ${USER_XINGMING} | ${USER_ENDPOINT} |" >> ${TODAY_WG_USER_FIRST_LOGIN_FILE}
+            echo "| ${CURRENT_DATE} | ${USER_XINGMING} | ${USER_ENDPOINT_IP} | ${USER_LATEST_HAND_TIME} |" >> ${TODAY_WG_USER_FIRST_LOGIN_FILE}
             #
+            USER_ENDPOINT_AREA=`F_IP_AREA ${USER_ENDPOINT_IP}`
             F_SEND_DINGDING > /dev/null
         fi
     fi
