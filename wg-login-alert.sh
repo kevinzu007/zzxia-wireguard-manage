@@ -33,7 +33,7 @@ DINGDING_MARKDOWN_PY="/usr/local/bin/dingding_by_markdown_file-login.py"
 # 必须软件jq
 if [ "`which jq >/dev/null 2>&1 ; echo $?`" != "0" ]; then
     ${DINGDING_MARKDOWN_PY}  \
-        --title "【Info:wg登录:`hostname -s`】"  \
+        --title "【Info:wg用户登录:`hostname -s`】"  \
         --message "$( echo -e "### 请安装软件jq" )"
     exit 1
 fi
@@ -44,7 +44,7 @@ fi
 F_SEND_DINGDING()
 {
     ${DINGDING_MARKDOWN_PY}  \
-        --title "【Info:wg登录:`hostname -s`】"  \
+        --title "【Info:wg用户登录:`hostname -s`】"  \
         --message "$( echo -e "### 用户：${USER_XINGMING} \n### 最近握手时间：${USER_LATEST_HAND_TIME} \n### WG_IP：${USER_IP} \n### 远程IP：${USER_ENDPOINT_IP} \n### 地理位置：${USER_ENDPOINT_AREA} \n\n" )"
 }
 
