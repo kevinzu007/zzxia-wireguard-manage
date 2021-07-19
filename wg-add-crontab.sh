@@ -18,3 +18,8 @@ echo "* * * * *  ${SH_PATH}/wg-status-collector-cron.sh
 0 0 * * *  ${SH_PATH}/wg-daily-report-cron.sh
 " > ${CRONTAB_FILE}
 
+
+echo "计划任务添加如下："
+crontab -l
+
+
