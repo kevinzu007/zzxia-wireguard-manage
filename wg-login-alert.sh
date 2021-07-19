@@ -30,6 +30,16 @@ CURRENT_DATE=`date -d "${TIME}" +%Y-%m-%d`
 DINGDING_MARKDOWN_PY="/usr/local/bin/dingding_by_markdown_file-login.py"
 
 
+# 必须软件jq
+if [ "`which jq >/dev/null 2>&1 ; echo $?`" != "0" ]; then
+    ${DINGDING_MARKDOWN_PY}  \
+        --title "【Info:wg登录:`hostname -s`】"  \
+        --message "$( echo -e "### 请安装软件jq" )"
+    exit 1
+fi
+
+
+
 # 钉钉
 F_SEND_DINGDING()
 {
@@ -51,7 +61,7 @@ F_IP_AREA()
 {
     F_IP=$1
     #F_AREA=` curl -s "http://apis.juhe.cn/ip/ip2addr?ip=${F_IP}&dtype=json&key=e5ad6f81997d4f101cc3d17409e18d96" | jq .result.area 2>/dev/null | sed -n 's/\"/ /gp' `
-    F_AREA=` curl -s https://api.ip.sb/geoip/${F_IP} | jq '.country,.region,.city' 2>/dev/null | sed -n 's/\"/ /gp' | awk 'NR == 1{printf "%s->",$0} NR == 2{printf "%s->",$0} NR == 3{printf     "%s\n",$0}' `
+    F_AREA=` curl -s https://api.ip.sb/geoip/${F_IP} | jq '.country,.region,.city' 2>/dev/null | sed -n 's/\"/ /gp' | awk 'NR == 1{printf "%s->",$0} NR == 2{printf "%s->",$0} NR == 3{printf "%s\n",$0}' `
     if [ "x${F_AREA}" = "x" -o "x${F_AREA}" = "xnull" ]; then
         F_AREA="获取地理位置失败"
     fi
