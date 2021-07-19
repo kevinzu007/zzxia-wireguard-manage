@@ -4,6 +4,9 @@
 # License: GNU GPLv3
 # Test On: CentOS 7
 #############################################################################
+#
+# 每2分钟运行一次
+# */2 * * * *  /root/zzxia-wireguard-manage/wg-login-alert.sh
 
 
 # sh
@@ -19,8 +22,8 @@ cd ${SH_PATH}
 
 # 本地env
 TIME=${TIME:-`date +%Y-%m-%dT%H:%M:%S`}
-TIME_START=${TIME}
-DATE_TIME=`date -d "${TIME}" +%Y%m%dt%H%M%S`
+#TIME_START=${TIME}
+#DATE_TIME=`date -d "${TIME}" +%Y%m%dt%H%M%S`
 CURRENT_DATE=`date -d "${TIME}" +%Y-%m-%d`
 #
 DINGDING_MARKDOWN_PY="/usr/local/bin/dingding_markdown.py"

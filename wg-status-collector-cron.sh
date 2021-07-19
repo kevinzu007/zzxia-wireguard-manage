@@ -6,6 +6,7 @@
 #############################################################################
 #
 # 每分钟采集一次
+# * * * * *  /root/zzxia-wireguard-manage/wg-status-collector-cron.sh
 
 
 # sh
@@ -15,6 +16,7 @@ cd ${SH_PATH}
 
 # env
 . ${SH_PATH}/env.sh
+#WG_IF=
 #WG_STATUS_CONLLECT_FILE=
 
 

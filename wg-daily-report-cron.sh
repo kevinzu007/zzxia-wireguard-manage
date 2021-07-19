@@ -5,7 +5,8 @@
 # Test On: CentOS 7
 #############################################################################
 #
-# 每天23:59运行
+# 每天00:00运行
+# 0 0 * * *  /root/zzxia-wireguard-manage/wg-daily-report-cron.sh
 #
 # 重启wg
 wg-quick down ${WG_IF} && wg-quick up ${WG_IF}
@@ -19,21 +20,24 @@ cd ${SH_PATH}
 
 # env
 . ${SH_PATH}/env.sh
+#WG_IF=
 #WG_STATUS_CONLLECT_FILE=
-#WG_REPORT_FILE=
 
 
 # 本地env
-TIME=${TIME:-`date +%Y-%m-%dT%H:%M:%S`}
-TIME_START=${TIME}
-DATE_TIME=`date -d "${TIME}" +%Y%m%dt%H%M%S`
-CURRENT_DATE=`date -d "${TIME}" +%Y-%m-%d`
+#TIME=${TIME:-`date +%Y-%m-%dT%H:%M:%S`}
+#TIME_START=${TIME}
+#DATE_TIME=`date -d "${TIME}" +%Y%m%dt%H%M%S`
+YESTERDAY_DATE=`date -d "yesterday" +%Y-%m-%d`
 #
-TODAY_WG_REPORT_FILE="/tmp/wg-report-today---${CURRENT_DATE}.md"
+[ -d "${SH_PATH}/report" ] || mkdir "${SH_PATH}/report"
+YESTERDAY_WG_REPORT_FILE="${SH_PATH}/report/wg-daily-report---${YESTERDAY_DATE}.md"
+WG_REPORT_FILE="${SH_PATH}/report/wg-report.list"
+#
 FORMAT_TABLE_SH="${SH_PATH}/format_table.sh"
 
 
-echo '|日期|姓名|总流量MiB|IN流量MiB|OUT流量MiB|用户IP|用户公钥|远程IP|'  > ${TODAY_WG_REPORT_FILE}
+echo '|日期|姓名|总流量MiB|IN流量MiB|OUT流量MiB|用户IP|用户公钥|远程IP|'  > ${YESTERDAY_WG_REPORT_FILE}
 #
 while read LINE
 do
@@ -59,12 +63,12 @@ do
     if [ ${USER_LATEST_HAND} -ne 0 ]; then
         # 有握手信息
         # 写入总报表
-        echo "| ${CURRENT_DATE} | ${USER_XINGMING} | ${USER_NET_TOTAL_MiB} | ${USER_NET_IN_MiB} | ${USER_NET_OUT_MiB} | ${USER_IP} | ${USER_PEER} | ${USER_ENDPOINT_IP} | " >> ${WG_REPORT_FILE}
-        # 今日报表
-        echo "| ${CURRENT_DATE} | ${USER_XINGMING} | ${USER_NET_TOTAL_MiB} | ${USER_NET_IN_MiB} | ${USER_NET_OUT_MiB} | ${USER_IP} | ${USER_PEER} | ${USER_ENDPOINT_IP} | " >> ${TODAY_WG_REPORT_FILE}
+        echo "| ${YESTERDAY_DATE} | ${USER_XINGMING} | ${USER_NET_TOTAL_MiB} | ${USER_NET_IN_MiB} | ${USER_NET_OUT_MiB} | ${USER_IP} | ${USER_PEER} | ${USER_ENDPOINT_IP} | " >> ${WG_REPORT_FILE}
+        # 昨日报表
+        echo "| ${YESTERDAY_DATE} | ${USER_XINGMING} | ${USER_NET_TOTAL_MiB} | ${USER_NET_IN_MiB} | ${USER_NET_OUT_MiB} | ${USER_IP} | ${USER_PEER} | ${USER_ENDPOINT_IP} | " >> ${YESTERDAY_WG_REPORT_FILE}
     fi
 done < ${WG_STATUS_CONLLECT_FILE}
 #
-${FORMAT_TABLE_SH}  --delimeter '|'  --title '|姓名|最后握手时间|总流量MiB|IN流量MiB|OUT流量MiB|用户IP|远程IP|'  --file ${TODAY_WG_REPORT_FILE}
+${FORMAT_TABLE_SH}  --delimeter '|'  --title '|日期|姓名|总流量MiB|IN流量MiB|OUT流量MiB|用户IP|用户公钥|远程IP|'  --file ${YESTERDAY_WG_REPORT_FILE}
 
 

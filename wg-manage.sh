@@ -15,6 +15,7 @@ cd ${SH_PATH}
 # env
 . ${SH_PATH}/env.sh
 #WG_STATUS_CONLLECT_FILE=
+#......
 
 
 # 本地env
