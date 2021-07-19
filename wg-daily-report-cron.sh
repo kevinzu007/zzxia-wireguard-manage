@@ -7,9 +7,6 @@
 #
 # 每天00:00运行
 # 0 0 * * *  /root/zzxia-wireguard-manage/wg-daily-report-cron.sh
-#
-# 重启wg
-wg-quick down ${WG_IF} && wg-quick up ${WG_IF}
 
 
 # sh
@@ -22,6 +19,7 @@ cd ${SH_PATH}
 . ${SH_PATH}/env.sh
 #WG_IF=
 #WG_STATUS_CONLLECT_FILE=
+#TODAY_WG_USER_FIRST_LOGIN_FILE=
 
 
 # 本地env
@@ -35,6 +33,12 @@ YESTERDAY_WG_REPORT_FILE="${SH_PATH}/report/wg-daily-report---${YESTERDAY_DATE}.
 WG_REPORT_FILE="${SH_PATH}/report/wg-report.list"
 #
 FORMAT_TABLE_SH="${SH_PATH}/format_table.sh"
+
+
+# 重启wg
+wg-quick down ${WG_IF} && wg-quick up ${WG_IF}
+# clean
+> ${TODAY_WG_USER_FIRST_LOGIN_FILE}
 
 
 echo '|日期|姓名|总流量MiB|IN流量MiB|OUT流量MiB|用户IP|用户公钥|远程IP|'  > ${YESTERDAY_WG_REPORT_FILE}
@@ -62,10 +66,10 @@ do
     # 是否有握手信息
     if [ ${USER_LATEST_HAND} -ne 0 ]; then
         # 有握手信息
-        # 写入总报表
-        echo "| ${YESTERDAY_DATE} | ${USER_XINGMING} | ${USER_NET_TOTAL_MiB} | ${USER_NET_IN_MiB} | ${USER_NET_OUT_MiB} | ${USER_IP} | ${USER_PEER} | ${USER_ENDPOINT_IP} | " >> ${WG_REPORT_FILE}
         # 昨日报表
         echo "| ${YESTERDAY_DATE} | ${USER_XINGMING} | ${USER_NET_TOTAL_MiB} | ${USER_NET_IN_MiB} | ${USER_NET_OUT_MiB} | ${USER_IP} | ${USER_PEER} | ${USER_ENDPOINT_IP} | " >> ${YESTERDAY_WG_REPORT_FILE}
+        # 写入总报表
+        echo "| ${YESTERDAY_DATE} | ${USER_XINGMING} | ${USER_NET_TOTAL_MiB} | ${USER_NET_IN_MiB} | ${USER_NET_OUT_MiB} | ${USER_IP} | ${USER_PEER} | ${USER_ENDPOINT_IP} | " >> ${WG_REPORT_FILE}
     fi
 done < ${WG_STATUS_CONLLECT_FILE}
 #

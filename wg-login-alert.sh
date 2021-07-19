@@ -18,6 +18,7 @@ cd ${SH_PATH}
 # env
 . ${SH_PATH}/env.sh
 #WG_STATUS_CONLLECT_FILE=
+#TODAY_WG_USER_FIRST_LOGIN_FILE=
 
 
 # 本地env
@@ -27,9 +28,6 @@ TIME=${TIME:-`date +%Y-%m-%dT%H:%M:%S`}
 CURRENT_DATE=`date -d "${TIME}" +%Y-%m-%d`
 #
 DINGDING_MARKDOWN_PY="/usr/local/bin/dingding_by_markdown_file-login.py"
-# 用户登录登记文件
-TODAY_WG_USER_FIRST_LOGIN_FILE="/tmp/wg-user-first-login-today.txt---${CURRENT_DATE}"
-touch  ${TODAY_WG_USER_FIRST_LOGIN_FILE}
 
 
 # 钉钉
