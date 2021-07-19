@@ -8,7 +8,7 @@
 # 每天23:59运行
 #
 # 重启wg
-wg-quick down ${WG_IF} && wg-quick down ${WG_IF}
+wg-quick down ${WG_IF} && wg-quick up ${WG_IF}
 
 
 # sh
