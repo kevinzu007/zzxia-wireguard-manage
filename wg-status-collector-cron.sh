@@ -15,6 +15,7 @@ SH_PATH=$( cd "$( dirname "$0" )" && pwd )
 cd ${SH_PATH}
 
 # env
+. /etc/profile         #--- 计划任务需要
 . ${SH_PATH}/env.sh
 #WG_IF=
 #WG_STATUS_CONLLECT_FILE=
