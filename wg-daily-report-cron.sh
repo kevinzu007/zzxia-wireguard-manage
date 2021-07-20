@@ -44,8 +44,8 @@ ${SH_WG_STATUS_COLLECTOR}
 > ${TODAY_WG_USER_FIRST_LOGIN_FILE}
 
 
-echo '|日期|姓名|总流量MiB|IN流量MiB|OUT流量MiB|用户IP|用户公钥|远程IP|'  > ${YESTERDAY_WG_REPORT_FILE}
-echo '| -- | -- | ------- | ------- | -------- | ---- | ------ | ---- |'  >> ${YESTERDAY_WG_REPORT_FILE}
+echo '|日期|姓名|总流量MiB|IN流量MiB|OUT流量MiB|用户IP|远程IP|'  > ${YESTERDAY_WG_REPORT_FILE}
+#echo '| -- | -- | ------- | ------- | -------- | ---- | ---- |'  >> ${YESTERDAY_WG_REPORT_FILE}
 #
 while read LINE
 do
@@ -71,12 +71,13 @@ do
         # 有握手信息
         USER_LATEST_HAND_TIME=`date -d @${USER_LATEST_HAND} +%H:%M:%S`
         # 昨日报表
-        echo "| ${YESTERDAY_DATE} | ${USER_XINGMING} | ${USER_NET_TOTAL_MiB} | ${USER_NET_IN_MiB} | ${USER_NET_OUT_MiB} | ${USER_IP} | ${USER_PEER} | ${USER_ENDPOINT_IP} | " >> ${YESTERDAY_WG_REPORT_FILE}
+        echo "| ${YESTERDAY_DATE} | ${USER_XINGMING} | ${USER_NET_TOTAL_MiB} | ${USER_NET_IN_MiB} | ${USER_NET_OUT_MiB} | ${USER_IP} | ${USER_ENDPOINT_IP} | " >> ${YESTERDAY_WG_REPORT_FILE}
         # 写入总报表
-        echo "| ${YESTERDAY_DATE} | ${USER_XINGMING} | ${USER_NET_TOTAL_MiB} | ${USER_NET_IN_MiB} | ${USER_NET_OUT_MiB} | ${USER_IP} | ${USER_PEER} | ${USER_ENDPOINT_IP} | " >> ${WG_REPORT_FILE}
+        echo "| ${YESTERDAY_DATE} | ${USER_XINGMING} | ${USER_NET_TOTAL_MiB} | ${USER_NET_IN_MiB} | ${USER_NET_OUT_MiB} | ${USER_IP} | ${USER_ENDPOINT_IP} | " >> ${WG_REPORT_FILE}
     fi
 done < ${WG_STATUS_CONLLECT_FILE}
 #
-${FORMAT_TABLE_SH}  --delimeter '|'  --title '|日期|姓名|总流量MiB|IN流量MiB|OUT流量MiB|用户IP|用户公钥|远程IP|'  --file ${YESTERDAY_WG_REPORT_FILE}
+#${FORMAT_TABLE_SH}  --delimeter '|'  --title '|日期|姓名|总流量MiB|IN流量MiB|OUT流量MiB|用户IP|远程IP|'  --file ${YESTERDAY_WG_REPORT_FILE}
+${FORMAT_TABLE_SH}  --delimeter '|'  --file ${YESTERDAY_WG_REPORT_FILE}
 
 
