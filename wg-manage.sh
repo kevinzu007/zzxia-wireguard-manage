@@ -26,7 +26,7 @@ USER_CONFIG_PATH="${SH_PATH}/user_config_info"
 WG_STATUS_REPORT_FILE="/tmp/wg-status-report.list"
 # sh
 FORMAT_TABLE_SH="${SH_PATH}/format_table.sh"
-SH_WG_STATUS_COLLECTOR="${SH_PATH}/wg-status-collector-cron.sh"
+WG_STATUS_COLLECTOR_SH="${SH_PATH}/wg-status-collector-cron.sh"
 
 
 
@@ -35,7 +35,7 @@ F_HELP()
     echo "
     用途：用于wireguard的用户管理
     依赖：${SH_PATH}/env.sh
-          ${SH_WG_STATUS_COLLECTOR}
+          ${WG_STATUS_COLLECTOR_SH}
     注意：
         1、如果使用参数【-R|--reload】，请确保你的wireguard服务器已经在本地安装配置完成
         2、修改环境变量文件【${SH_PATH}/env.sh】
@@ -223,7 +223,7 @@ do
         -s|--status)
             shift
             # clean
-            ${SH_WG_STATUS_COLLECTOR}
+            ${WG_STATUS_COLLECTOR_SH}
             > ${WG_STATUS_REPORT_FILE}
             while read LINE
             do

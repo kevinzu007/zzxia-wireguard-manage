@@ -28,7 +28,7 @@ TIME=${TIME:-`date +%Y-%m-%dT%H:%M:%S`}
 #DATE_TIME=`date -d "${TIME}" +%Y%m%dt%H%M%S`
 CURRENT_DATE=`date -d "${TIME}" +%Y-%m-%d`
 #
-DINGDING_MARKDOWN_PY="/usr/local/bin/dingding_by_markdown_file-login.py"
+DINGDING_MARKDOWN_PY="${SH_PATH}/dingding_by_markdown_file-login.py"
 
 
 # 必须软件jq
