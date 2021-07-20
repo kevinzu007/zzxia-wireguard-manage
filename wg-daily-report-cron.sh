@@ -34,11 +34,11 @@ YESTERDAY_WG_REPORT_FILE="${SH_PATH}/report/wg-daily-report---${YESTERDAY_DATE}.
 WG_REPORT_FILE="${SH_PATH}/report/wg-report.list"
 # sh
 FORMAT_TABLE_SH="${SH_PATH}/format_table.sh"
-SH_WG_STATUS_COLLECTOR="${SH_PATH}/wg-status-collector-cron.sh"
+WG_STATUS_COLLECTOR_SH="${SH_PATH}/wg-status-collector-cron.sh"
 
 
 # clean
-${SH_WG_STATUS_COLLECTOR}
+${WG_STATUS_COLLECTOR_SH}
 > ${TODAY_WG_USER_FIRST_LOGIN_FILE}
 
 
