@@ -16,7 +16,7 @@ echo
 echo "即将覆盖现有计划任务！"
 read -p '按任意键继续'
 
-echo "* * * * *  ${SH_PATH}/wg-status-collector-cron.sh
+echo "
 */2 * * * *  ${SH_PATH}/wg-login-alert-cron.sh
 0 0 * * *  ${SH_PATH}/wg-daily-report-cron.sh
 " > ${CRONTAB_FILE}
