@@ -1,13 +1,17 @@
 # zzxia-wireguard-manage
 
 ## 1 介绍
-wireguard VPN 服务器管理工具。提供用的列出、添加、删除、配置、重启功能
+wireguard VPN 服务器管理工具。提供用户的列出、添加、删除、导出配置、二维码分享，服务器配置、重启、警报、报表等功能
 
 ### 1.1 功能：
+1. 配置服务器
 1. 列出账号
 1. 添加删除账号
 1. 导出用户配置信息
 1. 重启
+1. 显示用户在线状态
+1. 每天第一次登录发送钉钉消息
+1. 每天生成用户报告
 
 ### 1.2 喜欢她，就满足她：
 1. 【Star】她，让她看到你是爱她的；
@@ -40,6 +44,12 @@ Linux shell
 $ cat env.sh 
 #!/bin/bash                                                                                                                                                                                    
 
+# run
+WG_STATUS_CONLLECT_FILE="/tmp/wg-status-conllect.txt"
+TODAY_WG_USER_FIRST_LOGIN_FILE="/tmp/wg-user-first-login-today.txt"
+#
+DINGDING_API_URL_FOR_LOGIN="https://oapi.dingtalk.com/robot/send?access_token=填上你的token在这里"
+
 # server env
 SERVER_CONF_FILE_PATH="/etc/wireguard"                       #--- wireguard服务器配置文件路径
 WG_IF='wg0'                                                  #--- wireguard服务器网卡
@@ -58,30 +68,29 @@ USER_ALOWED_IPs="${IP_PREFIX}.0/${IP_NETMASK},0.0.0.0/0"    #--- 用户端走VPN
 
 ### 4.2 服务器设置
 
-运行`wireguard-init-setup.sh`用于第一次配置服务器：
+运行`wg-init-setup.sh`用于第一次配置服务器：
 
 ```bash
-wireguard-init-setup.sh
+wg-init-setup.sh
 ```
 
 
 ### 4.3 服务器管理
 
 ```bash
-$ ./wireguard-manage.sh -h
+# ./wg-manage.sh -h
 
     用途：用于wireguard的用户管理
-    依赖：/home/kevin/git_project/zhf_sy/zzxia-wireguard-manage/env.sh
+    依赖：./env.sh
+          qrencode
     注意：
-        1、如果使用参数【-R|--reload】，请确保你的wireguard服务器已经在本地安装配置完成
-        2、修改环境变量文件【/home/kevin/git_project/zhf_sy/zzxia-wireguard-manage/env.sh】
-        3、如果本程序运行在非wireguard服务器上，可以将服务器配置文件指到任意你想要的位置（修改/home/kevin/git_project/zhf_sy/zzxia-wireguard-manage/env.sh 中 SERVER_CONF_FILE 变量的值即可）
     用法：
-        ./wireguard-manage.sh  [-h|--help]
-        ./wireguard-manage.sh  [-l|--list]
-        ./wireguard-manage.sh  [-a|--add {用户名}]  <{IP第4段}>
-        ./wireguard-manage.sh  [-r|--rm|-o|--output-config  {用户名}]
-        ./wireguard-manage.sh  [-R|--reload]
+        ./wg-manage.sh  [-h|--help]
+        ./wg-manage.sh  [-l|--list]
+        ./wg-manage.sh  [-a|--add {用户名}]  <{IP第4段}>
+        ./wg-manage.sh  [-r|--rm|-o|--output-config  {用户名}]
+        ./wg-manage.sh  [-R|--reload]
+        ./wg-manage.sh  [-s|--status]
     参数说明：
         $0   : 代表脚本本身
         []   : 代表是必选项
@@ -96,18 +105,34 @@ $ ./wireguard-manage.sh -h
         -r|--rm        删除用户
         -o|--output-config 输出用户配置文件
         -R|--reload    重启服务器
+        -s|--status    服务器状态
     示例:
         #
-        ./wireguard-manage.sh  -l              #--- 列出用户清单
+        ./wg-manage.sh  -l              #--- 列出用户清单
         #
-        ./wireguard-manage.sh  -a 猪猪侠 11    #--- 添加用户【猪猪侠】，IP地址尾号为【11】
-        ./wireguard-manage.sh  -a 猪猪侠       #--- 添加用户【猪猪侠】，IP地址尾号自动分配
+        ./wg-manage.sh  -a 猪猪侠 11    #--- 添加用户【猪猪侠】，IP地址尾号为【11】
+        ./wg-manage.sh  -a 猪猪侠       #--- 添加用户【猪猪侠】，IP地址尾号自动分配
         #
-        ./wireguard-manage.sh  -r 猪猪侠       #--- 删除用户【猪猪侠】
+        ./wg-manage.sh  -r 猪猪侠       #--- 删除用户【猪猪侠】
         #
-        ./wireguard-manage.sh  -o 猪猪侠       #--- 输出用户【猪猪侠】的配置文件
+        ./wg-manage.sh  -o 猪猪侠       #--- 输出用户【猪猪侠】的配置文件
         #
-        ./wireguard-manage.sh  -R              #--- 重启服务器
+        ./wg-manage.sh  -R              #--- 重启服务器
+        #
+        ./wg-manage.sh  -s              #--- 查看服务器状态
+```
+
+### 4.3 用户登录警报级用户登录报告（可选）
+
+添加计划任务：
+
+```bash
+./wg-add-crontab.sh
+```
+
+查看报告：
+```bash
+cat ./report/wg-report.list
 ```
 
 

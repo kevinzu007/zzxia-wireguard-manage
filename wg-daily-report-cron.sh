@@ -34,11 +34,12 @@ YESTERDAY_WG_REPORT_FILE="${SH_PATH}/report/wg-daily-report---${YESTERDAY_DATE}.
 WG_REPORT_FILE="${SH_PATH}/report/wg-report.list"
 # sh
 FORMAT_TABLE_SH="${SH_PATH}/format_table.sh"
-WG_STATUS_COLLECTOR_SH="${SH_PATH}/wg-status-collector-cron.sh"
 
 
+# 采集
+wg show "${WG_IF}" dump > "${WG_STATUS_CONLLECT_FILE}"
+sed -i '1d' "${WG_STATUS_CONLLECT_FILE}"
 # clean
-${WG_STATUS_COLLECTOR_SH}
 > ${TODAY_WG_USER_FIRST_LOGIN_FILE}
 
 
@@ -80,7 +81,8 @@ ${FORMAT_TABLE_SH}  --delimeter '|'  --file ${YESTERDAY_WG_REPORT_FILE}
 
 
 # 重启wg
-wg-quick down ${WG_IF} && wg-quick up ${WG_IF}
+wg-quick down ${WG_IF}
+wg-quick up ${WG_IF}
 
 
 
