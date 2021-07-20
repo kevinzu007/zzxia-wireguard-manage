@@ -31,17 +31,20 @@ YESTERDAY_DATE=`date -d "yesterday" +%Y-%m-%d`
 [ -d "${SH_PATH}/report" ] || mkdir "${SH_PATH}/report"
 YESTERDAY_WG_REPORT_FILE="${SH_PATH}/report/wg-daily-report---${YESTERDAY_DATE}.md"
 WG_REPORT_FILE="${SH_PATH}/report/wg-report.list"
-#
+# sh
 FORMAT_TABLE_SH="${SH_PATH}/format_table.sh"
+SH_WG_STATUS_COLLECTOR="${SH_PATH}/wg-status-collector-cron.sh"
 
 
 # 重启wg
 wg-quick down ${WG_IF} && wg-quick up ${WG_IF}
 # clean
+${SH_WG_STATUS_COLLECTOR}
 > ${TODAY_WG_USER_FIRST_LOGIN_FILE}
 
 
 echo '|日期|姓名|总流量MiB|IN流量MiB|OUT流量MiB|用户IP|用户公钥|远程IP|'  > ${YESTERDAY_WG_REPORT_FILE}
+echo '| -- | -- | ------- | ------- | -------- | ---- | ------ | ---- |'  >> ${YESTERDAY_WG_REPORT_FILE}
 #
 while read LINE
 do
