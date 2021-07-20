@@ -16,6 +16,7 @@ cd ${SH_PATH}
 
 
 # env
+. /etc/profile         #--- 计划任务需要
 . ${SH_PATH}/env.sh
 #WG_IF=
 #WG_STATUS_CONLLECT_FILE=
@@ -54,7 +55,6 @@ do
     USER_ENDPOINT_IP=`echo ${USER_ENDPOINT} | cut -d ':' -f 1`
     USER_ALLOWED_IPS=`echo $LINE | awk '{print $4}'`
     USER_LATEST_HAND=`echo $LINE | awk '{print $5}'`
-    USER_LATEST_HAND_TIME=`date -d @${USER_LATEST_HAND} +%H:%M:%S`
     USER_NET_IN=`echo $LINE | awk '{print $6}'`
     USER_NET_OUT=`echo $LINE | awk '{print $7}'`
     USER_KEEPALIVE=`echo $LINE | awk '{print $8}'`
@@ -69,6 +69,7 @@ do
     # 是否有握手信息
     if [ ${USER_LATEST_HAND} -ne 0 ]; then
         # 有握手信息
+        USER_LATEST_HAND_TIME=`date -d @${USER_LATEST_HAND} +%H:%M:%S`
         # 昨日报表
         echo "| ${YESTERDAY_DATE} | ${USER_XINGMING} | ${USER_NET_TOTAL_MiB} | ${USER_NET_IN_MiB} | ${USER_NET_OUT_MiB} | ${USER_IP} | ${USER_PEER} | ${USER_ENDPOINT_IP} | " >> ${YESTERDAY_WG_REPORT_FILE}
         # 写入总报表

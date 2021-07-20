@@ -233,7 +233,6 @@ do
                 USER_ENDPOINT_IP=`echo ${USER_ENDPOINT} | cut -d ':' -f 1`
                 USER_ALLOWED_IPS=`echo $LINE | awk '{print $4}'`
                 USER_LATEST_HAND=`echo $LINE | awk '{print $5}'`
-                USER_LATEST_HAND_TIME=`date -d @${USER_LATEST_HAND} +%H:%M:%S`
                 USER_NET_IN=`echo $LINE | awk '{print $6}'`
                 USER_NET_OUT=`echo $LINE | awk '{print $7}'`
                 USER_KEEPALIVE=`echo $LINE | awk '{print $8}'`
@@ -247,6 +246,7 @@ do
                 USER_IP=`grep -B 2 ${USER_PEER} ${SERVER_CONF_FILE} | head -n 1 | awk '{print $3}'`
                 # 是否有握手信息
                 if [ ${USER_LATEST_HAND} -ne 0 ]; then
+                    USER_LATEST_HAND_TIME=`date -d @${USER_LATEST_HAND} +%H:%M:%S`
                     # 有握手信息
                     echo "| ${USER_XINGMING} | ${USER_LATEST_HAND_TIME} | ${USER_NET_TOTAL_MiB} | ${USER_NET_IN_MiB} | ${USER_NET_OUT_MiB} | ${USER_IP} | ${USER_ENDPOINT_IP} | " >> ${WG_STATUS_REPORT_FILE}
                 fi

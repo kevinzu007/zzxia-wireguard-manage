@@ -8,18 +8,21 @@ cd ${SH_PATH}
 # env
 CRONTAB_FILE='/var/spool/cron/root'
 
-
-echo "将会覆盖现有【crontab -l】中的计划任务！"
+echo "现有计划任务如下："
+echo "------------------------------"
+crontab -l
+echo "------------------------------"
+echo
+echo "即将覆盖现有计划任务！"
 read -p '按任意键继续'
 
-
 echo "* * * * *  ${SH_PATH}/wg-status-collector-cron.sh
-*/2 * * * *  ${SH_PATH}/wg-login-alert.sh
+*/2 * * * *  ${SH_PATH}/wg-login-alert-cron.sh
 0 0 * * *  ${SH_PATH}/wg-daily-report-cron.sh
 " > ${CRONTAB_FILE}
 
-
 echo "计划任务添加如下："
+echo "------------------------------"
 crontab -l
-
+echo "------------------------------"
 
