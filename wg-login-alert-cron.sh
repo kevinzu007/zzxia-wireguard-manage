@@ -72,7 +72,9 @@ F_IP_AREA()
 }
 
 
-
+# 采集
+wg show "${WG_IF}" dump > "${WG_STATUS_CONLLECT_FILE}"
+sed -i '1d' "${WG_STATUS_CONLLECT_FILE}"
 #
 while read LINE
 do

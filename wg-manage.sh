@@ -26,7 +26,6 @@ USER_CONFIG_PATH="${SH_PATH}/user_config_info"
 WG_STATUS_REPORT_FILE="/tmp/wg-status-report.list"
 # sh
 FORMAT_TABLE_SH="${SH_PATH}/format_table.sh"
-WG_STATUS_COLLECTOR_SH="${SH_PATH}/wg-status-collector-cron.sh"
 
 
 
@@ -34,12 +33,9 @@ F_HELP()
 {
     echo "
     用途：用于wireguard的用户管理
-    依赖：${SH_PATH}/env.sh
-          ${WG_STATUS_COLLECTOR_SH}
+    依赖：./env.sh
+          qrencode
     注意：
-        1、如果使用参数【-R|--reload】，请确保你的wireguard服务器已经在本地安装配置完成
-        2、修改环境变量文件【${SH_PATH}/env.sh】
-        3、如果本程序运行在非wireguard服务器上，可以将服务器配置文件指到任意你想要的位置（修改${SH_PATH}/env.sh 中 SERVER_CONF_FILE 变量的值即可）
     用法：
         $0  [-h|--help]
         $0  [-l|--list]
@@ -180,6 +176,8 @@ do
             echo '------------------------------'
             F_USER_CONF | tee ${USER_CONFIG_PATH}/${USER_NAME}.conf.out
             echo '------------------------------'
+            echo "用户配置二维码："
+            qrencode -t ANSIUTF8  < ${USER_CONFIG_PATH}/${USER_NAME}.conf.out
             echo "OK"
             echo
             echo "服务器端：需要reload后才会生效"
@@ -211,7 +209,11 @@ do
             fi
             #
             echo "【${USER_NAME}】用户配置信息如下："
+            echo '------------------------------'
             cat  ${USER_CONFIG_PATH}/${USER_NAME}.conf.out
+            echo '------------------------------'
+            echo "用户配置二维码："
+            qrencode -t ANSIUTF8  < ${USER_CONFIG_PATH}/${USER_NAME}.conf.out
             exit
             ;;
         -R|--reload)
@@ -222,8 +224,10 @@ do
             ;;
         -s|--status)
             shift
+            # 采集
+            wg show "${WG_IF}" dump > "${WG_STATUS_CONLLECT_FILE}"
+            sed -i '1d' "${WG_STATUS_CONLLECT_FILE}"
             # clean
-            ${WG_STATUS_COLLECTOR_SH}
             > ${WG_STATUS_REPORT_FILE}
             while read LINE
             do
