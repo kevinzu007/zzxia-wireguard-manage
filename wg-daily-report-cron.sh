@@ -37,8 +37,6 @@ FORMAT_TABLE_SH="${SH_PATH}/format_table.sh"
 SH_WG_STATUS_COLLECTOR="${SH_PATH}/wg-status-collector-cron.sh"
 
 
-# 重启wg
-wg-quick down ${WG_IF} && wg-quick up ${WG_IF}
 # clean
 ${SH_WG_STATUS_COLLECTOR}
 > ${TODAY_WG_USER_FIRST_LOGIN_FILE}
@@ -79,5 +77,10 @@ done < ${WG_STATUS_CONLLECT_FILE}
 #
 #${FORMAT_TABLE_SH}  --delimeter '|'  --title '|日期|姓名|总流量MiB|IN流量MiB|OUT流量MiB|用户IP|远程IP|'  --file ${YESTERDAY_WG_REPORT_FILE}
 ${FORMAT_TABLE_SH}  --delimeter '|'  --file ${YESTERDAY_WG_REPORT_FILE}
+
+
+# 重启wg
+wg-quick down ${WG_IF} && wg-quick up ${WG_IF}
+
 
 
