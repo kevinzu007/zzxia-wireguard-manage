@@ -135,6 +135,14 @@ wg-init-setup.sh
 cat ./report/wg-report.list
 ```
 
+警报需要钉钉API，方法是建立钉钉群，然后添加一个钉钉机器人，然后把得到的api url写入到`env.sh`即可。
+
+测试警报：
+
+```bash
+./wg-login-alert-cron.sh
+```
+
 
 ## 5 参与贡献
 
