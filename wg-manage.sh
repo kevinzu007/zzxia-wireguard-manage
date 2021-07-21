@@ -143,8 +143,9 @@ do
             IP_SUFFIX=$1
             # 是否提供ip尾号
             if [ -z "${IP_SUFFIX}" ]; then
-                IP_SUFFIX=`grep '##' ${SERVER_CONF_FILE} | tail -n 1 | cut -d ' ' -f 3 | cut -d '.' -f 4`
-                let IP_SUFFIX=${IP_SUFFIX}+1
+                BASE_IP_SUFFIX=`grep '##' ${SERVER_CONF_FILE} | tail -n 1 | cut -d ' ' -f 3 | cut -d '.' -f 4`
+                [ -z "${BASE_IP_SUFFIX}" ] && BASE_IP_SUFFIX=10
+                let IP_SUFFIX=${BASE_IP_SUFFIX}+1
             else
                 grep '##' ${SERVER_CONF_FILE} | grep "${IP_SUFFIX}" | cut -d ' ' -f 3 | cut -d '.' -f 4 | grep "${IP_SUFFIX}" > /tmp/${SH_NAME}-search-ip.list
                 while read LINE; do
