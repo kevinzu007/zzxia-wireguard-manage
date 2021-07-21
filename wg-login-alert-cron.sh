@@ -18,7 +18,6 @@ cd ${SH_PATH}
 # env
 . /etc/profile         #--- 计划任务需要
 . ${SH_PATH}/env.sh
-#WG_STATUS_CONLLECT_FILE=
 #TODAY_WG_USER_FIRST_LOGIN_FILE=
 
 
@@ -27,12 +26,14 @@ TIME=${TIME:-`date +%Y-%m-%dT%H:%M:%S`}
 #TIME_START=${TIME}
 #DATE_TIME=`date -d "${TIME}" +%Y%m%dt%H%M%S`
 CURRENT_DATE=`date -d "${TIME}" +%Y-%m-%d`
+WG_LOGIN_STATUS_FILE="/tmp/wg-login-status.txt"
 #
 DINGDING_MARKDOWN_PY="${SH_PATH}/dingding_by_markdown_file-login.py"
 
 
 # 必须软件jq
 if [ "`which jq >/dev/null 2>&1 ; echo $?`" != "0" ]; then
+    echo -e "峰哥说：${SH_NAME} - 请安装软件jq"
     ${DINGDING_MARKDOWN_PY}  \
         --title "【Info:wg用户登录:`hostname -s`】"  \
         --message "$( echo -e "### 请安装软件jq" )"
@@ -73,8 +74,8 @@ F_IP_AREA()
 
 
 # 采集
-wg show "${WG_IF}" dump > "${WG_STATUS_CONLLECT_FILE}"
-sed -i '1d' "${WG_STATUS_CONLLECT_FILE}"
+wg show "${WG_IF}" dump > "${WG_LOGIN_STATUS_FILE}"
+sed -i '1d' "${WG_LOGIN_STATUS_FILE}"
 #
 while read LINE
 do
@@ -108,6 +109,6 @@ do
             F_SEND_DINGDING > /dev/null
         fi
     fi
-done < ${WG_STATUS_CONLLECT_FILE}
+done < ${WG_LOGIN_STATUS_FILE}
 
 

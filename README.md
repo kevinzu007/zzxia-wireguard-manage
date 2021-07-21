@@ -12,6 +12,7 @@ wireguard VPN 服务器管理工具。提供服务器配置、重启、警报、
 1. 显示用户在线状态
 1. 每天第一次登录发送钉钉消息
 1. 每天生成用户报告
+1. 总报告
 
 ### 1.2 喜欢她，就满足她：
 1. 【Star】她，让她看到你是爱她的；
@@ -45,10 +46,9 @@ $ cat env.sh
 #!/bin/bash                                                                                                                                                                                    
 
 # run
-WG_STATUS_CONLLECT_FILE="/tmp/wg-status-conllect.txt"
 TODAY_WG_USER_FIRST_LOGIN_FILE="/tmp/wg-user-first-login-today.txt"
 #
-DINGDING_API_URL_FOR_LOGIN="https://oapi.dingtalk.com/robot/send?access_token=填上你的token在这里"
+export DINGDING_API_URL_FOR_LOGIN="https://oapi.dingtalk.com/robot/send?access_token=填上你的token在这里"
 
 # server env
 SERVER_CONF_FILE_PATH="/etc/wireguard"                       #--- wireguard服务器配置文件路径
@@ -71,7 +71,7 @@ USER_ALOWED_IPs="${IP_PREFIX}.0/${IP_NETMASK},0.0.0.0/0"    #--- 用户端走VPN
 运行`wg-init-setup.sh`用于第一次配置服务器：
 
 ```bash
-wg-init-setup.sh
+# ./wg-init-setup.sh
 ```
 
 
@@ -92,7 +92,7 @@ wg-init-setup.sh
         ./wg-manage.sh  [-R|--reload]
         ./wg-manage.sh  [-s|--status]
     参数说明：
-        $0   : 代表脚本本身
+        \$0   : 代表脚本本身
         []   : 代表是必选项
         <>   : 代表是可选项
         |    : 代表左右选其一
@@ -127,12 +127,20 @@ wg-init-setup.sh
 添加计划任务：
 
 ```bash
-./wg-add-crontab.sh
+# ./wg-add-crontab.sh
 ```
 
 查看报告：
 ```bash
-cat ./report/wg-report.list
+# cat ./report/wg-report.list
++------------+----------+---------+---------+----------+-------------+----------------+
+|日期        |姓名      |总流浪MiB|IN流量MiB|OUT流量MiB|IP           |远程IP          |
++------------+----------+---------+---------+----------+-------------+----------------+
+|2021-07-19  |HB清      |.3       |.1       |.2        |172.30.5.23  |113.111.63.250  |
+|2021-07-19  |HB颖      |28.9     |3.4      |25.5      |172.30.5.31  |113.111.63.250  |
+|2021-07-20  |HB宇      |45.3     |8.3      |37.0      |172.30.5.22  |113.111.63.250  |
+|2021-07-20  |HB华      |708.9    |101.6    |607.3     |172.30.5.23  |113.111.63.250  |
++------------+----------+---------+---------+----------+-------------+----------------+
 ```
 
 警报需要钉钉API，方法是建立钉钉群，然后添加一个钉钉机器人，然后把得到的api url写入到`env.sh`即可。
@@ -140,7 +148,7 @@ cat ./report/wg-report.list
 测试警报：
 
 ```bash
-./wg-login-alert-cron.sh
+# ./wg-login-alert-cron.sh
 ```
 
 
