@@ -29,8 +29,8 @@ fi
 
 # mod
 modprobe wireguard
-if [ "`lsmod | grep wireguard ; echo $?`" != '0' ]; then
-    echo "内核模块【wireguard】未加载，请检查！"
+if [ "`lsmod | grep -q wireguard ; echo $?`" != '0' ]; then
+    echo -e "\n峰哥说：内核模块【wireguard】未加载，请检查！\n"
     exit 1
 fi
 
