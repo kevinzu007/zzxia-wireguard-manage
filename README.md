@@ -43,27 +43,26 @@ Linux shell
 
 ```bash
 $ cat env.sh 
-#!/bin/bash                                                                                                                                                                                    
-
-# run
-TODAY_WG_USER_FIRST_LOGIN_FILE="/tmp/wg-user-first-login-today.txt"
-#
+#!/bin/bash
+## ----- 一般需要修改 -----
+# 钉钉
 export DINGDING_API_URL_FOR_LOGIN="https://oapi.dingtalk.com/robot/send?access_token=填上你的token在这里"
-
 # server env
-SERVER_CONF_FILE_PATH="/etc/wireguard"                       #--- wireguard服务器配置文件路径
-WG_IF='wg0'                                                  #--- wireguard服务器网卡
-SERVER_CONF_FILE="${SERVER_CONF_FILE_PATH}/${WG_IF}.conf"
-SERVER_PRIVATE_KEY="${SERVER_CONF_FILE_PATH}/private.key"
-IP_PREFIX='172.30.0'                               #--- wireguard服务器网络地址前3节
-IP_NETMASK='24'                                    #--- wireguard服务器IP掩码
-#
-SERVER_PUBKEY=`wg pubkey < ${SERVER_PRIVATE_KEY}`  #--- wireguard服务器公钥
-SERVER_CONNECT_INFO='服务器IP:端口如51820'         #--- wireguard服务器用以接受用户连接的IP与端口
-
+SERVER_CONNECT_INFO='服务器IP:端口如51820'                  #--- wireguard服务器用以接受用户连接的IP与端口
 # user env
 USER_DNSs='192.168.11.3,192.168.11.4'                       #--- 用户的DNS
 USER_ALOWED_IPs="${IP_PREFIX}.0/${IP_NETMASK},0.0.0.0/0"    #--- 用户端走VPN链路的网络地址范围（用来设置用户端路由）
+
+## ----- 一般不需要修改 -----
+# server env
+SERVER_CONF_FILE_PATH="/etc/wireguard"             #--- wireguard服务器配置文件路径
+WG_IF='wg0'                                        #--- wireguard服务器网卡
+IP_PREFIX='172.30.0'                               #--- wireguard服务器网络地址前3节
+IP_NETMASK='24'                                    #--- wireguard服务器IP掩码
+# run
+SERVER_CONF_FILE="${SERVER_CONF_FILE_PATH}/${WG_IF}.conf"
+SERVER_PRIVATE_KEY="${SERVER_CONF_FILE_PATH}/private.key"
+TODAY_WG_USER_FIRST_LOGIN_FILE="/tmp/wg-user-first-login-today.txt"
 ```
 
 ### 4.2 服务器设置

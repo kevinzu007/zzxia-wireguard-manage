@@ -14,15 +14,16 @@ cd ${SH_PATH}
 
 # env
 . ${SH_PATH}/env.sh
-#WG_STATUS_CONLLECT_FILE=
 #......
 
 
 # 本地env
+SERVER_PUBKEY=`wg pubkey < ${SERVER_PRIVATE_KEY}`  #--- wireguard服务器公钥
 # user_config
 USER_CONFIG_PATH="${SH_PATH}/user_config_info"
 [ ! -d ${USER_CONFIG_PATH} ] && mkdir ${USER_CONFIG_PATH}
 #
+WG_CURRENT_STATUS_FILE="/tmp/wg-current-status.txt"
 WG_STATUS_REPORT_FILE="/tmp/wg-status-report.list"
 # sh
 FORMAT_TABLE_SH="${SH_PATH}/format_table.sh"
@@ -225,8 +226,8 @@ do
         -s|--status)
             shift
             # 采集
-            wg show "${WG_IF}" dump > "${WG_STATUS_CONLLECT_FILE}"
-            sed -i '1d' "${WG_STATUS_CONLLECT_FILE}"
+            wg show "${WG_IF}" dump > "${WG_CURRENT_STATUS_FILE}"
+            sed -i '1d' "${WG_CURRENT_STATUS_FILE}"
             # clean
             > ${WG_STATUS_REPORT_FILE}
             while read LINE
@@ -254,7 +255,7 @@ do
                     # 有握手信息
                     echo "| ${USER_XINGMING} | ${USER_LATEST_HAND_TIME} | ${USER_NET_TOTAL_MiB} | ${USER_NET_IN_MiB} | ${USER_NET_OUT_MiB} | ${USER_IP} | ${USER_ENDPOINT_IP} | " >> ${WG_STATUS_REPORT_FILE}
                 fi
-            done < ${WG_STATUS_CONLLECT_FILE}
+            done < ${WG_CURRENT_STATUS_FILE}
             ${FORMAT_TABLE_SH}  --delimeter '|'  --title '|姓名|最后握手时间|总流量MiB|IN流量MiB|OUT流量MiB|用户IP|远程IP|'  --file ${WG_STATUS_REPORT_FILE}
             exit
             ;;
