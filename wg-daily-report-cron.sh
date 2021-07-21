@@ -19,7 +19,6 @@ cd ${SH_PATH}
 . /etc/profile         #--- 计划任务需要
 . ${SH_PATH}/env.sh
 #WG_IF=
-#WG_STATUS_CONLLECT_FILE=
 #TODAY_WG_USER_FIRST_LOGIN_FILE=
 
 
@@ -28,6 +27,7 @@ cd ${SH_PATH}
 #TIME_START=${TIME}
 #DATE_TIME=`date -d "${TIME}" +%Y%m%dt%H%M%S`
 YESTERDAY_DATE=`date -d "yesterday" +%Y-%m-%d`
+WG_DAILY_STATUS_FILE="/tmp/wg-daily-status.txt"
 #
 [ -d "${SH_PATH}/report" ] || mkdir "${SH_PATH}/report"
 YESTERDAY_WG_REPORT_FILE="${SH_PATH}/report/wg-daily-report---${YESTERDAY_DATE}.md"
@@ -37,10 +37,8 @@ FORMAT_TABLE_SH="${SH_PATH}/format_table.sh"
 
 
 # 采集
-wg show "${WG_IF}" dump > "${WG_STATUS_CONLLECT_FILE}"
-sed -i '1d' "${WG_STATUS_CONLLECT_FILE}"
-# clean
-> ${TODAY_WG_USER_FIRST_LOGIN_FILE}
+wg show "${WG_IF}" dump > "${WG_DAILY_STATUS_FILE}"
+sed -i '1d' "${WG_DAILY_STATUS_FILE}"
 
 
 echo '|日期|姓名|总流量MiB|IN流量MiB|OUT流量MiB|用户IP|远程IP|'  > ${YESTERDAY_WG_REPORT_FILE}
@@ -74,8 +72,9 @@ do
         # 写入总报表
         echo "| ${YESTERDAY_DATE} | ${USER_XINGMING} | ${USER_NET_TOTAL_MiB} | ${USER_NET_IN_MiB} | ${USER_NET_OUT_MiB} | ${USER_IP} | ${USER_ENDPOINT_IP} | " >> ${WG_REPORT_FILE}
     fi
-done < ${WG_STATUS_CONLLECT_FILE}
+done < ${WG_DAILY_STATUS_FILE}
 #
+echo "昨日wg用户使用报告："
 #${FORMAT_TABLE_SH}  --delimeter '|'  --title '|日期|姓名|总流量MiB|IN流量MiB|OUT流量MiB|用户IP|远程IP|'  --file ${YESTERDAY_WG_REPORT_FILE}
 ${FORMAT_TABLE_SH}  --delimeter '|'  --file ${YESTERDAY_WG_REPORT_FILE}
 
@@ -84,5 +83,7 @@ ${FORMAT_TABLE_SH}  --delimeter '|'  --file ${YESTERDAY_WG_REPORT_FILE}
 wg-quick down ${WG_IF}
 wg-quick up ${WG_IF}
 
+# clean
+> ${TODAY_WG_USER_FIRST_LOGIN_FILE}
 
 
