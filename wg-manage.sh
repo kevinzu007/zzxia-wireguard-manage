@@ -203,6 +203,8 @@ do
                 exit 1
             fi
             sed -i "/^## ${USER_NAME}/,/^ *$/d" ${SERVER_CONF_FILE}
+            # 删除文件末尾的空行
+            sed -i ':n;/^\n*$/{N;$d;bn}'  ${SERVER_CONF_FILE}
             echo "OK，你需要reload服务器才能生效"
             exit
             ;;
