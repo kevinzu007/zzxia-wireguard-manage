@@ -35,9 +35,10 @@ if [ "`lsmod | grep -q wireguard ; echo $?`" != '0' ]; then
 fi
 
 
-# 私钥与公钥
-wg genkey > ${SERVER_PRIVATE_KEY}   # 生成私钥
-
+# 私钥
+if [ ! -f ${SERVER_PRIVATE_KEY} ]; then
+    wg genkey > ${SERVER_PRIVATE_KEY}   # 生成私钥
+fi
 
 # 设置服务器信息
 ip link add ${WG_IF} type wireguard
@@ -48,10 +49,12 @@ wg  set ${WG_IF}  listen-port 51820  private-key ${SERVER_PRIVATE_KEY}
 ip link set ${WG_IF} up
 
 # 保存配置到/etc/wireguard/wgN.conf
+touch ${SERVER_CONF_FILE}
 wg-quick save ${WG_IF}
 
 # 重启
-wg-quick down ${WG_IF}  &&  wg-quick up ${WG_IF}
+wg-quick down ${WG_IF}
+wg-quick up ${WG_IF}
 
 
 
