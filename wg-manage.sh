@@ -177,8 +177,12 @@ do
             echo '------------------------------'
             F_USER_CONF | tee ${USER_CONFIG_PATH}/${USER_NAME}.conf.out
             echo '------------------------------'
-            echo "用户配置二维码："
-            qrencode -t ANSIUTF8  < ${USER_CONFIG_PATH}/${USER_NAME}.conf.out
+            read -p '输出用户配置二维码，请按任意键......' ACK
+            if [ `which qrencode > /dev/null 2>&1 ; echo $?` -eq 0 ]; then
+                qrencode -t ANSIUTF8  < ${USER_CONFIG_PATH}/${USER_NAME}.conf.out
+            else
+                echo -e "\n峰哥说：没有找到软件【qrencode】，建议安装，这可以以二维码的方式输出配置信息，方便手机用户配置!\n"
+            fi
             echo "OK"
             echo
             echo "服务器端：需要reload后才会生效"
@@ -213,8 +217,13 @@ do
             echo '------------------------------'
             cat  ${USER_CONFIG_PATH}/${USER_NAME}.conf.out
             echo '------------------------------'
-            echo "用户配置二维码："
-            qrencode -t ANSIUTF8  < ${USER_CONFIG_PATH}/${USER_NAME}.conf.out
+            read -p '输出用户配置二维码，请按任意键......' ACK
+            if [ `which qrencode > /dev/null 2>&1 ; echo $?` -eq 0 ]; then
+                qrencode -t ANSIUTF8  < ${USER_CONFIG_PATH}/${USER_NAME}.conf.out
+            else
+                echo -e "\n峰哥说：没有找到软件【qrencode】，建议安装，这可以以二维码的方式输出配置信息，方便手机用户配置!\n"
+            fi
+            echo "OK"
             exit
             ;;
         -R|--reload)
