@@ -77,6 +77,7 @@ F_IP_AREA()
 wg show "${WG_IF}" dump > "${WG_LOGIN_STATUS_FILE}"
 sed -i '1d' "${WG_LOGIN_STATUS_FILE}"
 #
+touch ${TODAY_WG_USER_FIRST_LOGIN_FILE}
 while read LINE
 do
     USER_PEER=`echo $LINE | awk '{print $1}'`
