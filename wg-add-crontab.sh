@@ -6,6 +6,7 @@ SH_PATH=$( cd "$( dirname "$0" )" && pwd )
 cd ${SH_PATH}
 
 # env
+.  ${SH_PATH}/env.sh
 CRONTAB_FILE='/var/spool/cron/root'
 
 echo "现有计划任务如下："
