@@ -62,10 +62,10 @@ F_SEND_DINGDING()
 F_IP_AREA()
 {
     F_IP=$1
-    AREA=` curl -s "http://apis.juhe.cn/ip/ip2addr?ip=${IP}&dtype=json&key=e5ad6f81997d4f101cc3d17409e18d96" | jq .result.area 2>/dev/null | sed -n 's/\"/ /gp' `
+    AREA=` curl -s "http://www.cip.cc/${F_IP}" | grep '数据二' | awk -F ":" '{print $2}' | awk '{gsub(/^\s+|\s+$/, ""); print}' | awk '{gsub(/\s+/, ""); print}' `
     #F_AREA=` curl -s https://api.ip.sb/geoip/${F_IP} | jq '.country,.region,.city' 2>/dev/null | sed -n 's/\"/ /gp' | awk 'NR == 1{printf "%s->",$0} NR == 2{printf "%s->",$0} NR == 3{printf "%s\n",$0}' `
     if [ "x${F_AREA}" = "x" -o "x${F_AREA}" = "xnull" ]; then
-        F_AREA="获取地理位置失败"
+        F_AREA="获取地理位置失败【IP：${F_IP}】"
     fi
     F_AREA=`echo ${F_AREA} | sed 's/\"//g'`
     echo "${F_AREA}"
