@@ -17,6 +17,7 @@ echo "即将覆盖现有计划任务！"
 read -p '按任意键继续'
 
 echo "
+@reboot    ${SH_PATH}/env.sh; /usr/bin/wg-quick up ${WG_IF}
 0 0 * * *  ${SH_PATH}/wg-daily-report-cron.sh
 * * * * *  ${SH_PATH}/wg-login-alert-cron.sh
 " > ${CRONTAB_FILE}
