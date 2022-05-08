@@ -143,23 +143,39 @@ do
             IP_SUFFIX=$1
             # 是否提供ip尾号
             if [ -z "${IP_SUFFIX}" ]; then
-                BASE_IP_SUFFIX=`grep '##' ${SERVER_CONF_FILE} | tail -n 1 | cut -d ' ' -f 3 | cut -d '.' -f 4`
-                [ -z "${BASE_IP_SUFFIX}" ] && BASE_IP_SUFFIX=10
-                let IP_SUFFIX=${BASE_IP_SUFFIX}+1
-            else
-                grep '##' ${SERVER_CONF_FILE} | grep "${IP_SUFFIX}" | cut -d ' ' -f 3 | cut -d '.' -f 4 | grep "${IP_SUFFIX}" > /tmp/${SH_NAME}-search-ip.list
-                while read LINE; do
-                    if [ "x${LINE}" = "x${IP_SUFFIX}" ]; then
-                        echo -e "\n峰哥说：IP尾号【${IP_SUFFIX}】已经存在，请换一个！\n"
-                        exit 1
+		# 未提供
+                grep '##' ${SERVER_CONF_FILE} | cut -d ' ' -f 3 | cut -d '.' -f 4 | sort > /tmp/${SH_NAME}-exist-ip.list
+                sed -i 's/^/S/; s/$/E/' /tmp/${SH_NAME}-exist-ip.list
+                # 普通用户IP从11开始分配
+                for i in {11..254}; do
+                    grep -q "S${i}E" /tmp/${SH_NAME}-exist-ip.list
+                    if [ $? -ne 0 ]; then
+                        IP_SUFFIX=$i
+                        break
                     fi
-                done < /tmp/${SH_NAME}-search-ip.list
+                done
+                if [ -z "${IP_SUFFIX}" ]; then
+                    echo -e "\n峰哥说：我艹，IP地址【${IP_PREFIX}.[11~254]】已经用完了！\n"
+                    exit 9
+                fi
+            else
+		# 已提供
+                grep '##' ${SERVER_CONF_FILE} | grep "${IP_SUFFIX}" | cut -d ' ' -f 3 | cut -d '.' -f 4  > /tmp/${SH_NAME}-search-ip.list
+		sed -i 's/^/S/; s/$/E/'  /tmp/${SH_NAME}-search-ip.list
+		grep -q "S${IP_SUFFIX}E"  /tmp/${SH_NAME}-search-ip.list
+		if [ $? -eq 0 ]; then
+		    echo -e "\n峰哥说：IP尾号【${IP_SUFFIX}】已经存在，请换一个！\n"
+		    exit 1
+		fi
             fi
             USER_IP=${IP_PREFIX}.${IP_SUFFIX}
             # 用户是否已存在
-            if [ `grep -q "## ${USER_NAME}" ${SERVER_CONF_FILE}; echo $?` -eq 0 ]; then
+            grep "##" ${SERVER_CONF_FILE} | grep "${USER_NAME}" | cut -d ' ' -f 2  > /tmp/${SH_NAME}-exist-user.list
+	    sed  -i 's/^/S/; s/$/E/'  /tmp/${SH_NAME}-exist-user.list
+	    grep -q "S${USER_NAME}E"  /tmp/${SH_NAME}-exist-user.list
+            if [ $? -eq 0 ]; then
                 echo -e "\n峰哥说：用户【${USER_NAME}】已存在\n"
-                exit
+                exit 1
             fi
             #
             SERVER_ALOWED_IPs="${USER_IP}/32"
@@ -198,11 +214,11 @@ do
             # 删除${USER_CONFIG_PATH}目录下用户信息
             rm -f  ${USER_CONFIG_PATH}/${USER_NAME}.*
             # 删除wgN.conf中的配置
-            if [ `grep -q "## ${USER_NAME}" ${SERVER_CONF_FILE}; echo $?` -ne 0 ]; then
+            if [ `grep -q "## ${USER_NAME} " ${SERVER_CONF_FILE}; echo $?` -ne 0 ]; then
                 echo -e "\n峰哥说：用户【${USER_NAME}】不存在\n"
                 exit 1
             fi
-            sed -i "/^## ${USER_NAME}/,/^ *$/d" ${SERVER_CONF_FILE}
+            sed -i "/^## ${USER_NAME} /,/^ *$/d" ${SERVER_CONF_FILE}
             # 删除文件末尾的空行
             sed -i ':n;/^\n*$/{N;$d;bn}'  ${SERVER_CONF_FILE}
             echo "OK，你需要reload服务器才能生效"
@@ -211,7 +227,7 @@ do
         -o|--output-config)
             USER_NAME=$2
             shift 2
-            if [ `grep -q "## ${USER_NAME}" ${SERVER_CONF_FILE}; echo $?` -ne 0 ]; then
+            if [ `grep -q "## ${USER_NAME} " ${SERVER_CONF_FILE}; echo $?` -ne 0 ]; then
                 echo -e "\n峰哥说：用户【${USER_NAME}】不存在\n"
                 exit 1
             fi
