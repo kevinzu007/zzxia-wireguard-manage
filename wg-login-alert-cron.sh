@@ -83,7 +83,7 @@ F_IP_AREA()
     if [ "x${F_AREA}" = "x" -o "x${F_AREA}" = "xnull" ]; then
         F_AREA="获取地理位置失败【IP：${F_IP}】"
     fi
-    F_AREA=`echo ${F_AREA} | sed 's/\"//g'`
+    F_AREA=`echo ${F_AREA} | sed -e 's/\"//g' -e 's/|//g'`
     echo "${F_AREA}"
     return 0
 }
