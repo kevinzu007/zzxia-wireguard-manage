@@ -18,7 +18,7 @@ cd ${SH_PATH}
 # env
 . /etc/profile         #--- 计划任务需要
 . ${SH_PATH}/env.sh
-#TODAY_WG_USER_FIRST_LOGIN_FILE=
+#TODAY_WG_USER_PREVIOUS_LOGIN_FILE=
 
 
 # 本地env
@@ -42,19 +42,27 @@ fi
 
 
 
-# 钉钉
-F_SEND_DINGDING()
+# 登录钉钉消息
+F_LOGIN_SEND_DINGDING()
 {
     ${DINGDING_MARKDOWN_PY}  \
         --title "【Info:wg用户登录:`hostname -s`】"  \
-        --message "$( echo -e "### 用户：${USER_XINGMING} \n### 最近握手时间：${USER_LATEST_HAND_TIME} \n### WG_IP：${USER_IP} \n### 远程IP：${USER_ENDPOINT_IP} \n### 地理位置：${USER_ENDPOINT_AREA} \n\n" )"
+        --message "$( echo -e "### 用户：${USER_XINGMING} \n### 最近握手时间：${USER_LATEST_HAND_SECOND_TIME} \n### WG_IP：${USER_IP} \n### 远程IP：${USER_ENDPOINT_IP} \n### 地理位置：${USER_ENDPOINT_AREA} \n\n" )"
+}
+
+# 离线钉钉消息
+F_OFFLINE_SEND_DINGDING()
+{
+    ${DINGDING_MARKDOWN_PY}  \
+        --title "【Info:wg用户离线:`hostname -s`】"  \
+        --message "$( echo -e "### 用户：${USER_XINGMING} \n### 最近握手时间：${USER_LATEST_HAND_SECOND_TIME} \n### WG_IP：${USER_IP} \n### 远程IP：${USER_ENDPOINT_IP} \n### 地理位置：${USER_ENDPOINT_AREA} \n\n" )"
 }
 
 
 ## 邮件
 #F_SEND_MAIL()
 #{
-#    echo -e "### 用户：${USER_XINGMING} \n### 最近握手时间：${USER_LATEST_HAND_TIME} \n### WG_IP：${USER_IP} \n### 远程IP：${USER_ENDPOINT_IP} \n\n" | mailx  -s "【wg登录:`hostname -s`}】用户：${USER_XINGMING}"  ${EMAIL}  >/dev/null 2>&1
+#    echo -e "### 用户：${USER_XINGMING} \n### 最近握手时间：${USER_LATEST_HAND_SECOND_TIME} \n### WG_IP：${USER_IP} \n### 远程IP：${USER_ENDPOINT_IP} \n\n" | mailx  -s "【wg登录:`hostname -s`}】用户：${USER_XINGMING}"  ${EMAIL}  >/dev/null 2>&1
 #}
 
 
@@ -77,15 +85,18 @@ F_IP_AREA()
 wg show "${WG_IF}" dump > "${WG_LOGIN_STATUS_FILE}"
 sed -i '1d' "${WG_LOGIN_STATUS_FILE}"
 #
-touch ${TODAY_WG_USER_FIRST_LOGIN_FILE}
+touch ${TODAY_WG_USER_PREVIOUS_LOGIN_FILE}
 while read LINE
 do
     USER_PEER=`echo $LINE | awk '{print $1}'`
     USER_PRESHARED_KEY=`echo $LINE | awk '{print $2}'`
+    #
     USER_ENDPOINT=`echo $LINE | awk '{print $3}'`
     USER_ENDPOINT_IP=`echo ${USER_ENDPOINT} | cut -d ':' -f 1`
+    USER_ENDPOINT_UDP_PORT=`echo ${USER_ENDPOINT} | cut -d ':' -f 2`
+    #
     USER_ALLOWED_IPS=`echo $LINE | awk '{print $4}'`
-    USER_LATEST_HAND=`echo $LINE | awk '{print $5}'`
+    USER_LATEST_HAND_SECOND=`echo $LINE | awk '{print $5}'`
     USER_NET_IN=`echo $LINE | awk '{print $6}'`
     USER_NET_OUT=`echo $LINE | awk '{print $7}'`
     USER_KEEPALIVE=`echo $LINE | awk '{print $8}'`
@@ -97,17 +108,33 @@ do
     # 查用户
     USER_XINGMING=`grep -B 2 ${USER_PEER} ${SERVER_CONF_FILE} | head -n 1 | awk '{print $2}'`
     USER_IP=`grep -B 2 ${USER_PEER} ${SERVER_CONF_FILE} | head -n 1 | awk '{print $3}'`
+    #
     # 是否有握手信息
-    if [ ${USER_LATEST_HAND} -ne 0 ]; then
+    if [ ${USER_LATEST_HAND_SECOND} -ne 0 ]; then
         # 有握手信息
-        USER_LATEST_HAND_TIME=`date -d @${USER_LATEST_HAND} +%H:%M:%S`
+        USER_LATEST_HAND_SECOND_TIME=`date -d @${USER_LATEST_HAND_SECOND} +%H:%M:%S`
+        USER_ENDPOINT_AREA=`F_IP_AREA ${USER_ENDPOINT_IP}`
         # 是否已记录（如果远程地址换了会怎样？）
-        if [ `grep -q ${USER_XINGMING} ${TODAY_WG_USER_FIRST_LOGIN_FILE} ; echo $?` -ne 0 ]; then
-            # 未记录
-            echo "| ${CURRENT_DATE} | ${USER_XINGMING} | ${USER_ENDPOINT_IP} | ${USER_LATEST_HAND_TIME} |" >> ${TODAY_WG_USER_FIRST_LOGIN_FILE}
+        if [ `grep -q ${USER_XINGMING} ${TODAY_WG_USER_PREVIOUS_LOGIN_FILE} ; echo $?` -eq 0 ]; then
+            # 找到，代表用户登录过
+            CURRENT_SECOND=$(date +%s)
+            let TIME_INTERVAL=${CURRENT_SECOND}-${USER_LATEST_HAND_SECOND}
+            USER_ENDPOINT_IP_LAST=$(grep "${USER_XINGMING}" ${TODAY_WG_USER_PREVIOUS_LOGIN_FILE}  |  awk '{print $3}')
             #
-            USER_ENDPOINT_AREA=`F_IP_AREA ${USER_ENDPOINT_IP}`
-            F_SEND_DINGDING > /dev/null
+            if [[ ${TIME_INTERVAL} -gt 300 ]]; then
+                # 最后登录时间超过300秒，代表用户离线
+                sed -i "/${USER_XINGMING}/d"  ${TODAY_WG_USER_PREVIOUS_LOGIN_FILE}
+                F_OFFLINE_SEND_DINGDING > /dev/null
+            elif [[ "${USER_ENDPOINT_IP}" != "${USER_ENDPOINT_IP_LAST}" ]]; then
+                # 和上次登录IP不一样
+                sed -i "/${USER_XINGMING}/d"  ${TODAY_WG_USER_PREVIOUS_LOGIN_FILE}
+                echo "| ${CURRENT_DATE} | ${USER_XINGMING} | ${USER_ENDPOINT_IP} | ${USER_LATEST_HAND_SECOND_TIME} | ${USER_ENDPOINT_AREA} |" >> ${TODAY_WG_USER_PREVIOUS_LOGIN_FILE}
+                F_LOGIN_SEND_DINGDING > /dev/null
+            fi
+        else
+            # 未找到，代表用户未登录过
+            echo "| ${CURRENT_DATE} | ${USER_XINGMING} | ${USER_ENDPOINT_IP} | ${USER_LATEST_HAND_SECOND_TIME} | ${USER_ENDPOINT_AREA} |" >> ${TODAY_WG_USER_PREVIOUS_LOGIN_FILE}
+            F_LOGIN_SEND_DINGDING > /dev/null
         fi
     fi
 done < ${WG_LOGIN_STATUS_FILE}
