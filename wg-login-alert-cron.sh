@@ -120,6 +120,7 @@ do
             CURRENT_SECOND=$(date +%s)
             let TIME_INTERVAL=${CURRENT_SECOND}-${USER_LATEST_HAND_SECOND}
             USER_ENDPOINT_IP_LAST=$(grep "${USER_XINGMING}" ${TODAY_WG_USER_LATEST_LOGIN_FILE}  |  awk -F '|' '{print $4}')
+            USER_ENDPOINT_IP_LAST=$(echo ${USER_ENDPOINT_IP_LAST})
             #
             if [[ ${TIME_INTERVAL} -gt 300 ]]; then
                 # 最后登录时间超过300秒，代表用户离线
