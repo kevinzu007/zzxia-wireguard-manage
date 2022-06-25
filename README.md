@@ -10,7 +10,8 @@ wireguard VPN 服务器管理工具。提供服务器配置、重启、警报、
 1. 导出用户配置信息
 1. 重启
 1. 显示用户在线状态
-1. 每天第一次登录发送钉钉消息
+1. 用户登录发送钉钉消息
+1. 用户离线发送钉钉消息
 1. 每天生成用户报告
 1. 总报告
 
@@ -54,7 +55,7 @@ IP_NETMASK='24'                                    #--- wireguard服务器IP掩�
 # run
 SERVER_CONF_FILE="${SERVER_CONF_FILE_PATH}/${WG_IF}.conf"
 SERVER_PRIVATE_KEY="${SERVER_CONF_FILE_PATH}/private.key"
-TODAY_WG_USER_FIRST_LOGIN_FILE="/tmp/wg-user-first-login-today.txt"
+TODAY_WG_USER_LATEST_LOGIN_FILE="/tmp/wg-user-first-login-today.txt"
 
 ## ----- 一般需要修改 -----
 # 钉钉
