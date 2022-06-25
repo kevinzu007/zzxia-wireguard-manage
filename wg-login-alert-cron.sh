@@ -18,7 +18,7 @@ cd ${SH_PATH}
 # env
 . /etc/profile         #--- 计划任务需要
 . ${SH_PATH}/env.sh
-#TODAY_WG_USER_PREVIOUS_LOGIN_FILE=
+#TODAY_WG_USER_LATEST_LOGIN_FILE=
 
 
 # 本地env
@@ -85,7 +85,7 @@ F_IP_AREA()
 wg show "${WG_IF}" dump > "${WG_LOGIN_STATUS_FILE}"
 sed -i '1d' "${WG_LOGIN_STATUS_FILE}"
 #
-touch ${TODAY_WG_USER_PREVIOUS_LOGIN_FILE}
+touch ${TODAY_WG_USER_LATEST_LOGIN_FILE}
 while read LINE
 do
     USER_PEER=`echo $LINE | awk '{print $1}'`
@@ -115,25 +115,25 @@ do
         USER_LATEST_HAND_SECOND_TIME=`date -d @${USER_LATEST_HAND_SECOND} +%H:%M:%S`
         USER_ENDPOINT_AREA=`F_IP_AREA ${USER_ENDPOINT_IP}`
         # 是否已记录（如果远程地址换了会怎样？）
-        if [ `grep -q ${USER_XINGMING} ${TODAY_WG_USER_PREVIOUS_LOGIN_FILE} ; echo $?` -eq 0 ]; then
+        if [ `grep -q ${USER_XINGMING} ${TODAY_WG_USER_LATEST_LOGIN_FILE} ; echo $?` -eq 0 ]; then
             # 找到，代表用户登录过
             CURRENT_SECOND=$(date +%s)
             let TIME_INTERVAL=${CURRENT_SECOND}-${USER_LATEST_HAND_SECOND}
-            USER_ENDPOINT_IP_LAST=$(grep "${USER_XINGMING}" ${TODAY_WG_USER_PREVIOUS_LOGIN_FILE}  |  awk '{print $3}')
+            USER_ENDPOINT_IP_LAST=$(grep "${USER_XINGMING}" ${TODAY_WG_USER_LATEST_LOGIN_FILE}  |  awk '{print $3}')
             #
             if [[ ${TIME_INTERVAL} -gt 300 ]]; then
                 # 最后登录时间超过300秒，代表用户离线
-                sed -i "/${USER_XINGMING}/d"  ${TODAY_WG_USER_PREVIOUS_LOGIN_FILE}
+                sed -i "/${USER_XINGMING}/d"  ${TODAY_WG_USER_LATEST_LOGIN_FILE}
                 F_OFFLINE_SEND_DINGDING > /dev/null
             elif [[ "${USER_ENDPOINT_IP}" != "${USER_ENDPOINT_IP_LAST}" ]]; then
                 # 和上次登录IP不一样
-                sed -i "/${USER_XINGMING}/d"  ${TODAY_WG_USER_PREVIOUS_LOGIN_FILE}
-                echo "| ${CURRENT_DATE} | ${USER_XINGMING} | ${USER_ENDPOINT_IP} | ${USER_LATEST_HAND_SECOND_TIME} | ${USER_ENDPOINT_AREA} |" >> ${TODAY_WG_USER_PREVIOUS_LOGIN_FILE}
+                sed -i "/${USER_XINGMING}/d"  ${TODAY_WG_USER_LATEST_LOGIN_FILE}
+                echo "| ${CURRENT_DATE} | ${USER_XINGMING} | ${USER_ENDPOINT_IP} | ${USER_LATEST_HAND_SECOND_TIME} | ${USER_ENDPOINT_AREA} |" >> ${TODAY_WG_USER_LATEST_LOGIN_FILE}
                 F_LOGIN_SEND_DINGDING > /dev/null
             fi
         else
             # 未找到，代表用户未登录过
-            echo "| ${CURRENT_DATE} | ${USER_XINGMING} | ${USER_ENDPOINT_IP} | ${USER_LATEST_HAND_SECOND_TIME} | ${USER_ENDPOINT_AREA} |" >> ${TODAY_WG_USER_PREVIOUS_LOGIN_FILE}
+            echo "| ${CURRENT_DATE} | ${USER_XINGMING} | ${USER_ENDPOINT_IP} | ${USER_LATEST_HAND_SECOND_TIME} | ${USER_ENDPOINT_AREA} |" >> ${TODAY_WG_USER_LATEST_LOGIN_FILE}
             F_LOGIN_SEND_DINGDING > /dev/null
         fi
     fi
