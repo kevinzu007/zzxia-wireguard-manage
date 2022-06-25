@@ -50,12 +50,20 @@ F_LOGIN_SEND_DINGDING()
         --message "$( echo -e "### 用户：${USER_XINGMING} \n### 最近握手时间：${USER_LATEST_HAND_SECOND_TIME} \n### WG_IP：${USER_IP} \n### 远程IP：${USER_ENDPOINT_IP} \n### 地理位置：${USER_ENDPOINT_AREA} \n\n" )"
 }
 
+# 登录钉钉消息
+F_NEW_IP_SEND_DINGDING()
+{
+    ${DINGDING_MARKDOWN_PY}  \
+        --title "【Info:wg用户登录:`hostname -s`】"  \
+        --message "$( echo -e "### 用户：${USER_XINGMING} \n### 新远程IP：${USER_ENDPOINT_IP} \n### 地理位置：${USER_ENDPOINT_AREA} \n\n" )"
+}
+
 # 离线钉钉消息
 F_OFFLINE_SEND_DINGDING()
 {
     ${DINGDING_MARKDOWN_PY}  \
         --title "【Info:wg用户离线:`hostname -s`】"  \
-        --message "$( echo -e "### 用户：${USER_XINGMING} \n### 最近握手时间：${USER_LATEST_HAND_SECOND_TIME} \n### WG_IP：${USER_IP} \n### 远程IP：${USER_ENDPOINT_IP} \n### 地理位置：${USER_ENDPOINT_AREA} \n\n" )"
+        --message "$( echo -e "### 用户：${USER_XINGMING} \n### 最近握手时间：${USER_LATEST_HAND_SECOND_TIME} \n\n" )"
 }
 
 
@@ -122,15 +130,15 @@ do
             USER_ENDPOINT_IP_LAST=$(grep "${USER_XINGMING}" ${TODAY_WG_USER_LATEST_LOGIN_FILE}  |  awk -F '|' '{print $4}')
             USER_ENDPOINT_IP_LAST=$(echo ${USER_ENDPOINT_IP_LAST})
             #
-            if [[ ${TIME_INTERVAL} -gt 300 ]]; then
+            if [ ${TIME_INTERVAL} -gt 300 ]; then
                 # 最后登录时间超过300秒，代表用户离线
                 sed -i "/${USER_XINGMING}/d"  ${TODAY_WG_USER_LATEST_LOGIN_FILE}
                 F_OFFLINE_SEND_DINGDING > /dev/null
-            elif [[ "${USER_ENDPOINT_IP}" != "${USER_ENDPOINT_IP_LAST}" ]]; then
+            elif [ "${USER_ENDPOINT_IP}" != "${USER_ENDPOINT_IP_LAST}" ]; then
                 # 和上次登录IP不一样
                 sed -i "/${USER_XINGMING}/d"  ${TODAY_WG_USER_LATEST_LOGIN_FILE}
                 echo "| ${CURRENT_DATE} | ${USER_XINGMING} | ${USER_ENDPOINT_IP} | ${USER_LATEST_HAND_SECOND_TIME} | ${USER_ENDPOINT_AREA} |" >> ${TODAY_WG_USER_LATEST_LOGIN_FILE}
-                F_LOGIN_SEND_DINGDING > /dev/null
+                F_NEW_IP_SEND_DINGDING > /dev/null
             fi
         else
             # 未找到，代表用户未登录过
