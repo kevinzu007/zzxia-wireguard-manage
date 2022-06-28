@@ -7,6 +7,9 @@
 #
 # 每2分钟运行一次
 # */2 * * * *  /root/zzxia-wireguard-manage/wg-login-alert.sh
+#
+# 等待日报完成统计并重启清零
+sleep 30
 
 
 # sh
