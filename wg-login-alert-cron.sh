@@ -7,6 +7,9 @@
 #
 # 每2分钟运行一次
 # */2 * * * *  /root/zzxia-wireguard-manage/wg-login-alert.sh
+#
+# 等待日报完成统计并重启清零
+sleep 30
 
 
 # sh
@@ -125,24 +128,43 @@ do
         # 是否已记录（如果远程地址换了会怎样？）
         if [ `grep -q ${USER_XINGMING} ${TODAY_WG_USER_LATEST_LOGIN_FILE} ; echo $?` -eq 0 ]; then
             # 找到，代表用户登录过
-            CURRENT_SECOND=$(date +%s)
-            let TIME_INTERVAL=${CURRENT_SECOND}-${USER_LATEST_HAND_SECOND}
             USER_ENDPOINT_IP_LAST=$(grep "${USER_XINGMING}" ${TODAY_WG_USER_LATEST_LOGIN_FILE}  |  awk -F '|' '{print $4}')
             USER_ENDPOINT_IP_LAST=$(echo ${USER_ENDPOINT_IP_LAST})
             #
-            if [ ${TIME_INTERVAL} -gt 300 ]; then
-                # 最后登录时间超过300秒，代表用户离线
-                sed -i "/${USER_XINGMING}/d"  ${TODAY_WG_USER_LATEST_LOGIN_FILE}
-                F_OFFLINE_SEND_DINGDING > /dev/null
-            elif [ "${USER_ENDPOINT_IP}" != "${USER_ENDPOINT_IP_LAST}" ]; then
+            if [ "${USER_ENDPOINT_IP}" != "${USER_ENDPOINT_IP_LAST}" ]; then
                 # 和上次登录IP不一样
                 sed -i "/${USER_XINGMING}/d"  ${TODAY_WG_USER_LATEST_LOGIN_FILE}
-                echo "| ${CURRENT_DATE} | ${USER_XINGMING} | ${USER_ENDPOINT_IP} | ${USER_LATEST_HAND_SECOND_TIME} | ${USER_ENDPOINT_AREA} |" >> ${TODAY_WG_USER_LATEST_LOGIN_FILE}
+                USER_LOGIN_STATUS='已登录'
+                echo "| ${CURRENT_DATE} | ${USER_XINGMING} | ${USER_ENDPOINT_IP} | ${USER_LATEST_HAND_SECOND_TIME} | ${USER_ENDPOINT_AREA} | ${USER_LOGIN_STATUS} |" >> ${TODAY_WG_USER_LATEST_LOGIN_FILE}
                 F_NEW_IP_SEND_DINGDING > /dev/null
+                continue
+            fi
+            #
+            CURRENT_SECOND=$(date +%s)
+            let TIME_INTERVAL=${CURRENT_SECOND}-${USER_LATEST_HAND_SECOND}
+            USER_LOGIN_STATUS_LAST=$(grep "${USER_XINGMING}" ${TODAY_WG_USER_LATEST_LOGIN_FILE}  |  awk -F '|' '{print $7}')
+            USER_LOGIN_STATUS_LAST=$(echo ${USER_LOGIN_STATUS_LAST})
+            if [ ${TIME_INTERVAL} -gt 300 ]; then
+                # 最后登录时间超过300秒
+                if [[ "${USER_LOGIN_STATUS_LAST}" = "已登录" ]]; then
+                    sed -i "/${USER_XINGMING}/d"  ${TODAY_WG_USER_LATEST_LOGIN_FILE}
+                    USER_LOGIN_STATUS='已离线'
+                    echo "| ${CURRENT_DATE} | ${USER_XINGMING} | ${USER_ENDPOINT_IP} | ${USER_LATEST_HAND_SECOND_TIME} | ${USER_ENDPOINT_AREA} | ${USER_LOGIN_STATUS} |" >> ${TODAY_WG_USER_LATEST_LOGIN_FILE}
+                    F_OFFLINE_SEND_DINGDING > /dev/null
+                fi
+            else
+                # 最后登录时间小于300秒
+                if [[ "${USER_LOGIN_STATUS_LAST}" = "已离线" ]]; then
+                    sed -i "/${USER_XINGMING}/d"  ${TODAY_WG_USER_LATEST_LOGIN_FILE}
+                    USER_LOGIN_STATUS='已登录'
+                    echo "| ${CURRENT_DATE} | ${USER_XINGMING} | ${USER_ENDPOINT_IP} | ${USER_LATEST_HAND_SECOND_TIME} | ${USER_ENDPOINT_AREA} | ${USER_LOGIN_STATUS} |" >> ${TODAY_WG_USER_LATEST_LOGIN_FILE}
+                    F_LOGIN_SEND_DINGDING > /dev/null
+                fi
             fi
         else
             # 未找到，代表用户未登录过
-            echo "| ${CURRENT_DATE} | ${USER_XINGMING} | ${USER_ENDPOINT_IP} | ${USER_LATEST_HAND_SECOND_TIME} | ${USER_ENDPOINT_AREA} |" >> ${TODAY_WG_USER_LATEST_LOGIN_FILE}
+            USER_LOGIN_STATUS='已登录'
+            echo "| ${CURRENT_DATE} | ${USER_XINGMING} | ${USER_ENDPOINT_IP} | ${USER_LATEST_HAND_SECOND_TIME} | ${USER_ENDPOINT_AREA} | ${USER_LOGIN_STATUS} |" >> ${TODAY_WG_USER_LATEST_LOGIN_FILE}
             F_LOGIN_SEND_DINGDING > /dev/null
         fi
     fi
