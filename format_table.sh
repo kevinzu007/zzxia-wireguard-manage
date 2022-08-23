@@ -164,7 +164,8 @@ function output_table(){
     table=`echo "${table}" | sed 's/✖//g'`
     #echo -e "${table}"
     #echo -e $table|column -s "${sep}" -t|awk '{if($0 ~ /^+/){gsub(" ","-",$0);print $0}else{gsub("\\(\\*\\)","\033[31m(*)\033[0m",$0);print $0}}'
-    echo -e $table|column -s "${sep}" -t|awk '{if($0 ~ /^+/){gsub(" ","-",$0);print $0}else{gsub("\\*","\033[31m*\033[0m",$0);gsub("错误","\033[31m错误\033[0m",$0);gsub("失败","\033[31m失败\033[0m",$0);gsub("成功","\033[32;1m成功\033[0m",$0);print $0}}'
+    #echo -e $table|column -s "${sep}" -t|awk '{if($0 ~ /^+/){gsub(" ","-",$0);print $0}else{gsub("\\*","\033[31m*\033[0m",$0);gsub("错误","\033[31m错误\033[0m",$0);gsub("失败","\033[31m失败\033[0m",$0);gsub("成功","\033[32;1m成功\033[0m",$0);print $0}}'
+    echo -e $table|column -s "${sep}" -t|awk '{if($0 ~ /^\+/){gsub(" ","-",$0);print $0}else{gsub("\\*","\033[31m*\033[0m",$0);gsub("错误","\033[31m错误\033[0m",$0);gsub("失败","\033[31m失败\033[0m",$0);gsub("成功","\033[32;1m成功\033[0m",$0);print $0}}'
     #echo -e $table|column -s "${sep}" -t|awk '{if($0 ~ /^+/){gsub(" ","-",$0);print $0}else{gsub("\\*","\033[31m*\033[0m",$0);gsub("错误","\033[31m错误\033[0m",$0);gsub("失败","\033[31m失败\033[0m",$0);gsub("成功","\033[32;1m成功\033[0m",$0);gsub("已发布","\033[32;1m已发布\033[0m",$0);print $0}}'
 }
 
