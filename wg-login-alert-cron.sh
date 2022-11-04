@@ -84,7 +84,7 @@ F_IP_AREA()
     F_AREA=` curl -s "http://www.cip.cc/${F_IP}" | grep '数据二' | awk -F ":" '{print $2}' | awk '{gsub(/^\s+|\s+$/, ""); print}' | awk '{gsub(/\s+/, ""); print}' `
     #F_AREA=` curl -s https://api.ip.sb/geoip/${F_IP} | jq '.country,.region,.city' 2>/dev/null | sed -n 's/\"/ /gp' | awk 'NR == 1{printf "%s->",$0} NR == 2{printf "%s->",$0} NR == 3{printf "%s\n",$0}' `
     if [ "x${F_AREA}" = "x" -o "x${F_AREA}" = "xnull" ]; then
-        F_AREA="获取失败【${F_IP}】"
+        F_AREA="获取失败：${F_IP}"
     fi
     F_AREA=`echo ${F_AREA} | sed -e 's/\"//g' -e 's/|//g'`
     echo "${F_AREA}"
