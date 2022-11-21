@@ -49,7 +49,7 @@ fi
 F_LOGIN_SEND_DINGDING()
 {
     ${DINGDING_MARKDOWN_PY}  \
-        --title "【Info:wg用户登录:`hostname -s`】"  \
+        --title "【Info:wg登录:`hostname -s`】"  \
         --message "$( echo -e "### 用户：${USER_XINGMING} \n### 最近握手时间：${USER_LATEST_HAND_SECOND_TIME} \n### WG_IP：${USER_IP} \n### 远程IP：${USER_ENDPOINT_IP} \n### 地理位置：${USER_ENDPOINT_AREA} \n\n" )"
 }
 
@@ -57,7 +57,7 @@ F_LOGIN_SEND_DINGDING()
 F_NEW_IP_SEND_DINGDING()
 {
     ${DINGDING_MARKDOWN_PY}  \
-        --title "【Info:wg用户登录:`hostname -s`】"  \
+        --title "【Info:wg登录:`hostname -s`】"  \
         --message "$( echo -e "### 用户：${USER_XINGMING} \n### 新远程IP：${USER_ENDPOINT_IP} \n### 地理位置：${USER_ENDPOINT_AREA} \n\n" )"
 }
 
