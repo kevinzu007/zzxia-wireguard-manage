@@ -49,7 +49,7 @@ fi
 F_LOGIN_SEND_DINGDING()
 {
     ${DINGDING_MARKDOWN_PY}  \
-        --title "【Info:wg用户登录:`hostname -s`】"  \
+        --title "【Info:wg登录:`hostname -s`】"  \
         --message "$( echo -e "### 用户：${USER_XINGMING} \n### 最近握手时间：${USER_LATEST_HAND_SECOND_TIME} \n### WG_IP：${USER_IP} \n### 远程IP：${USER_ENDPOINT_IP} \n### 地理位置：${USER_ENDPOINT_AREA} \n\n" )"
 }
 
@@ -57,7 +57,7 @@ F_LOGIN_SEND_DINGDING()
 F_NEW_IP_SEND_DINGDING()
 {
     ${DINGDING_MARKDOWN_PY}  \
-        --title "【Info:wg用户登录:`hostname -s`】"  \
+        --title "【Info:wg登录:`hostname -s`】"  \
         --message "$( echo -e "### 用户：${USER_XINGMING} \n### 新远程IP：${USER_ENDPOINT_IP} \n### 地理位置：${USER_ENDPOINT_AREA} \n\n" )"
 }
 
@@ -84,7 +84,7 @@ F_IP_AREA()
     F_AREA=` curl -s "http://www.cip.cc/${F_IP}" | grep '数据二' | awk -F ":" '{print $2}' | awk '{gsub(/^\s+|\s+$/, ""); print}' | awk '{gsub(/\s+/, ""); print}' `
     #F_AREA=` curl -s https://api.ip.sb/geoip/${F_IP} | jq '.country,.region,.city' 2>/dev/null | sed -n 's/\"/ /gp' | awk 'NR == 1{printf "%s->",$0} NR == 2{printf "%s->",$0} NR == 3{printf "%s\n",$0}' `
     if [ "x${F_AREA}" = "x" -o "x${F_AREA}" = "xnull" ]; then
-        F_AREA="获取地理位置失败【IP：${F_IP}】"
+        F_AREA="获取失败：${F_IP}"
     fi
     F_AREA=`echo ${F_AREA} | sed -e 's/\"//g' -e 's/|//g'`
     echo "${F_AREA}"
@@ -124,17 +124,21 @@ do
     if [ ${USER_LATEST_HAND_SECOND} -ne 0 ]; then
         # 有握手信息
         USER_LATEST_HAND_SECOND_TIME=`date -d @${USER_LATEST_HAND_SECOND} +%H:%M:%S`
-        USER_ENDPOINT_AREA=`F_IP_AREA ${USER_ENDPOINT_IP}`
         # 是否已记录（如果远程地址换了会怎样？）
         if [ `grep -q ${USER_XINGMING} ${TODAY_WG_USER_LATEST_LOGIN_FILE} ; echo $?` -eq 0 ]; then
             # 找到，代表用户登录过
             USER_ENDPOINT_IP_LAST=$(grep "${USER_XINGMING}" ${TODAY_WG_USER_LATEST_LOGIN_FILE}  |  awk -F '|' '{print $4}')
             USER_ENDPOINT_IP_LAST=$(echo ${USER_ENDPOINT_IP_LAST})
+            USER_ENDPOINT_AREA=$(grep "${USER_XINGMING}" ${TODAY_WG_USER_LATEST_LOGIN_FILE}  |  awk -F '|' '{print $6}')
+            USER_ENDPOINT_AREA=$(echo ${USER_ENDPOINT_IP_LAST})
             #
             if [ "${USER_ENDPOINT_IP}" != "${USER_ENDPOINT_IP_LAST}" ]; then
                 # 和上次登录IP不一样
+                # 删除旧的（有些不合理，但我不想使力）
                 sed -i "/${USER_XINGMING}/d"  ${TODAY_WG_USER_LATEST_LOGIN_FILE}
                 USER_LOGIN_STATUS='已登录'
+                # 重新获取地理位置
+                USER_ENDPOINT_AREA=`F_IP_AREA ${USER_ENDPOINT_IP}`
                 echo "| ${CURRENT_DATE} | ${USER_XINGMING} | ${USER_ENDPOINT_IP} | ${USER_LATEST_HAND_SECOND_TIME} | ${USER_ENDPOINT_AREA} | ${USER_LOGIN_STATUS} |" >> ${TODAY_WG_USER_LATEST_LOGIN_FILE}
                 F_NEW_IP_SEND_DINGDING > /dev/null
                 continue
@@ -164,6 +168,8 @@ do
         else
             # 未找到，代表用户未登录过
             USER_LOGIN_STATUS='已登录'
+            # 获取地理位置
+            USER_ENDPOINT_AREA=`F_IP_AREA ${USER_ENDPOINT_IP}`
             echo "| ${CURRENT_DATE} | ${USER_XINGMING} | ${USER_ENDPOINT_IP} | ${USER_LATEST_HAND_SECOND_TIME} | ${USER_ENDPOINT_AREA} | ${USER_LOGIN_STATUS} |" >> ${TODAY_WG_USER_LATEST_LOGIN_FILE}
             F_LOGIN_SEND_DINGDING > /dev/null
         fi
