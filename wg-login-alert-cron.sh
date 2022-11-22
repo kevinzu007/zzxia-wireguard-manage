@@ -154,9 +154,9 @@ do
         LINE_NUM=$(F_SEARCH_USER_NAME  ${USER_NAME})
         if [[ ${LINE_NUM} =~ ^[0-9]+$ ]]; then
             # 找到，代表用户登录过
-            USER_ENDPOINT_IP_LAST=$(sed -n "${LINE_NUM}}p"  ${TODAY_WG_USER_LATEST_LOGIN_FILE}  |  awk -F '|' '{print $4}')
+            USER_ENDPOINT_IP_LAST=$(sed -n "${LINE_NUM}p"  ${TODAY_WG_USER_LATEST_LOGIN_FILE}  |  awk -F '|' '{print $4}')
             USER_ENDPOINT_IP_LAST=$(echo ${USER_ENDPOINT_IP_LAST})
-            USER_ENDPOINT_AREA=$(sed -n "${LINE_NUM}}p"  ${TODAY_WG_USER_LATEST_LOGIN_FILE}  |  awk -F '|' '{print $6}')
+            USER_ENDPOINT_AREA=$(sed -n "${LINE_NUM}p"  ${TODAY_WG_USER_LATEST_LOGIN_FILE}  |  awk -F '|' '{print $6}')
             USER_ENDPOINT_AREA=$(echo ${USER_ENDPOINT_IP_LAST})
             #
             if [ "${USER_ENDPOINT_IP}" != "${USER_ENDPOINT_IP_LAST}" ]; then
@@ -173,7 +173,7 @@ do
             #
             CURRENT_SECOND=$(date +%s)
             let TIME_INTERVAL=${CURRENT_SECOND}-${USER_LATEST_HAND_SECOND}
-            USER_LOGIN_STATUS_LAST=$(sed -n "${LINE_NUM}}p"  ${TODAY_WG_USER_LATEST_LOGIN_FILE}  |  awk -F '|' '{print $7}')
+            USER_LOGIN_STATUS_LAST=$(sed -n "${LINE_NUM}p"  ${TODAY_WG_USER_LATEST_LOGIN_FILE}  |  awk -F '|' '{print $7}')
             USER_LOGIN_STATUS_LAST=$(echo ${USER_LOGIN_STATUS_LAST})
             if [ ${TIME_INTERVAL} -gt 300 ]; then
                 # 最后登录时间超过300秒
