@@ -36,7 +36,7 @@ DINGDING_MARKDOWN_PY="${SH_PATH}/dingding_by_markdown_file-login.py"
 
 # 必须软件jq
 if [ "`which jq >/dev/null 2>&1 ; echo $?`" != "0" ]; then
-    echo -e "峰哥说：${SH_NAME} - 请安装软件jq"
+    echo -e "猪猪侠警告：${SH_NAME} - 请安装软件jq"
     ${DINGDING_MARKDOWN_PY}  \
         --title "【Info:wg用户登录:`hostname -s`】"  \
         --message "$( echo -e "### 请安装软件jq" )"

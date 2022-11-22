@@ -115,7 +115,7 @@ AllowedIPs = ${USER_ALOWED_IPs}
 
 TEMP=`getopt -o hla:r:o:Rs  -l help,list,add:,rm:,output-config:,reload,status -- "$@"`
 if [ $? != 0 ]; then
-    echo -e "\n峰哥说：参数不合法，请查看帮助【$0 --help】\n"
+    echo -e "\n猪猪侠警告：参数不合法，请查看帮助【$0 --help】\n"
     exit 1
 fi
 #
@@ -155,7 +155,7 @@ do
                     fi
                 done
                 if [ -z "${IP_SUFFIX}" ]; then
-                    echo -e "\n峰哥说：我艹，IP地址【${IP_PREFIX}.[11~254]】已经用完了！\n"
+                    echo -e "\n猪猪侠警告：我艹，IP地址【${IP_PREFIX}.[11~254]】已经用完了！\n"
                     exit 9
                 fi
             else
@@ -164,7 +164,7 @@ do
                 sed -i 's/^/S/; s/$/E/'  /tmp/${SH_NAME}-search-ip.list
                 grep -q "S${IP_SUFFIX}E"  /tmp/${SH_NAME}-search-ip.list
                 if [ $? -eq 0 ]; then
-                    echo -e "\n峰哥说：IP尾号【${IP_SUFFIX}】已经存在，请换一个！\n"
+                    echo -e "\n猪猪侠警告：IP尾号【${IP_SUFFIX}】已经存在，请换一个！\n"
                     exit 1
                 fi
             fi
@@ -174,7 +174,7 @@ do
 	        sed  -i 's/^/S/; s/$/E/'  /tmp/${SH_NAME}-exist-user.list
 	        grep -q "S${USER_NAME}E"  /tmp/${SH_NAME}-exist-user.list
             if [ $? -eq 0 ]; then
-                echo -e "\n峰哥说：用户【${USER_NAME}】已存在\n"
+                echo -e "\n猪猪侠警告：用户【${USER_NAME}】已存在\n"
                 exit 1
             fi
             #
@@ -198,7 +198,7 @@ do
             if [ `which qrencode > /dev/null 2>&1 ; echo $?` -eq 0 ]; then
                 qrencode -t ANSIUTF8  < ${USER_CONFIG_PATH}/${USER_NAME}.conf.out
             else
-                echo -e "\n峰哥说：没有找到软件【qrencode】，建议安装，这可以以二维码的方式输出配置信息，方便手机用户配置!\n"
+                echo -e "\n猪猪侠警告：没有找到软件【qrencode】，建议安装，这可以以二维码的方式输出配置信息，方便手机用户配置!\n"
             fi
             echo "OK"
             echo
@@ -215,7 +215,7 @@ do
             rm -f  ${USER_CONFIG_PATH}/${USER_NAME}.*
             # 删除wgN.conf中的配置
             if [ `grep -q "## ${USER_NAME} " ${SERVER_CONF_FILE}; echo $?` -ne 0 ]; then
-                echo -e "\n峰哥说：用户【${USER_NAME}】不存在\n"
+                echo -e "\n猪猪侠警告：用户【${USER_NAME}】不存在\n"
                 exit 1
             fi
             sed -i "/^## ${USER_NAME} /,/^ *$/d" ${SERVER_CONF_FILE}
@@ -228,7 +228,7 @@ do
             USER_NAME=$2
             shift 2
             if [ `grep -q "## ${USER_NAME} " ${SERVER_CONF_FILE}; echo $?` -ne 0 ]; then
-                echo -e "\n峰哥说：用户【${USER_NAME}】不存在\n"
+                echo -e "\n猪猪侠警告：用户【${USER_NAME}】不存在\n"
                 exit 1
             fi
             #
@@ -240,7 +240,7 @@ do
             if [ `which qrencode > /dev/null 2>&1 ; echo $?` -eq 0 ]; then
                 qrencode -t ANSIUTF8  < ${USER_CONFIG_PATH}/${USER_NAME}.conf.out
             else
-                echo -e "\n峰哥说：没有找到软件【qrencode】，建议安装，这可以以二维码的方式输出配置信息，方便手机用户配置!\n"
+                echo -e "\n猪猪侠警告：没有找到软件【qrencode】，建议安装，这可以以二维码的方式输出配置信息，方便手机用户配置!\n"
             fi
             echo "OK"
             exit
@@ -293,7 +293,7 @@ do
             break
             ;;
         *)
-            echo -e "\n峰哥说：未知参数，请查看帮助【$0 --help】\n"
+            echo -e "\n猪猪侠警告：未知参数，请查看帮助【$0 --help】\n"
             exit 1
             ;;
     esac
