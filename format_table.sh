@@ -201,7 +201,7 @@ function output_table(){
 # 参数检查
 TEMP=`getopt  -o hd:t:r:f:  -l help,delimeter:,title:,row:,file: -- "$@"`
 if [ $? != 0 ]; then
-    echo -e "\n峰哥说：参数不合法，请查看帮助【$0 --help】\n"
+    echo -e "\n猪猪侠警告：参数不合法，请查看帮助【$0 --help】\n"
     exit 1
 fi
 #
@@ -293,7 +293,7 @@ do
             ;;
         -r|--row)
             if [ -z "${T_TITLE}" ]; then
-                echo -e "\n峰哥说：你还没设置标题呢！\n"
+                echo -e "\n猪猪侠警告：你还没设置标题呢！\n"
                 exit 1
             fi
             T_ROW="$2"
@@ -320,7 +320,7 @@ do
             break
             ;;
         *)
-            echo -e "\n峰哥说：未知参数，请查看帮助【$0 --help】\n"
+            echo -e "\n猪猪侠警告：未知参数，请查看帮助【$0 --help】\n"
             exit 1
             ;;
     esac
