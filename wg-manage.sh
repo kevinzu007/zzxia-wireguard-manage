@@ -143,7 +143,7 @@ do
             IP_SUFFIX=$1
             # 是否提供ip尾号
             if [ -z "${IP_SUFFIX}" ]; then
-		# 未提供
+                # 未提供
                 grep '##' ${SERVER_CONF_FILE} | cut -d ' ' -f 3 | cut -d '.' -f 4 | sort > /tmp/${SH_NAME}-exist-ip.list
                 sed -i 's/^/S/; s/$/E/' /tmp/${SH_NAME}-exist-ip.list
                 # 普通用户IP从11开始分配
@@ -159,20 +159,20 @@ do
                     exit 9
                 fi
             else
-		# 已提供
+                # 已提供
                 grep '##' ${SERVER_CONF_FILE} | grep "${IP_SUFFIX}" | cut -d ' ' -f 3 | cut -d '.' -f 4  > /tmp/${SH_NAME}-search-ip.list
-		sed -i 's/^/S/; s/$/E/'  /tmp/${SH_NAME}-search-ip.list
-		grep -q "S${IP_SUFFIX}E"  /tmp/${SH_NAME}-search-ip.list
-		if [ $? -eq 0 ]; then
-		    echo -e "\n峰哥说：IP尾号【${IP_SUFFIX}】已经存在，请换一个！\n"
-		    exit 1
-		fi
+                sed -i 's/^/S/; s/$/E/'  /tmp/${SH_NAME}-search-ip.list
+                grep -q "S${IP_SUFFIX}E"  /tmp/${SH_NAME}-search-ip.list
+                if [ $? -eq 0 ]; then
+                    echo -e "\n峰哥说：IP尾号【${IP_SUFFIX}】已经存在，请换一个！\n"
+                    exit 1
+                fi
             fi
             USER_IP=${IP_PREFIX}.${IP_SUFFIX}
             # 用户是否已存在
             grep "##" ${SERVER_CONF_FILE} | grep "${USER_NAME}" | cut -d ' ' -f 2  > /tmp/${SH_NAME}-exist-user.list
-	    sed  -i 's/^/S/; s/$/E/'  /tmp/${SH_NAME}-exist-user.list
-	    grep -q "S${USER_NAME}E"  /tmp/${SH_NAME}-exist-user.list
+	        sed  -i 's/^/S/; s/$/E/'  /tmp/${SH_NAME}-exist-user.list
+	        grep -q "S${USER_NAME}E"  /tmp/${SH_NAME}-exist-user.list
             if [ $? -eq 0 ]; then
                 echo -e "\n峰哥说：用户【${USER_NAME}】已存在\n"
                 exit 1
@@ -275,16 +275,16 @@ do
                 USER_NET_TOTAL_MiB=`echo "scale=1; ${USER_NET_IN_MiB} + ${USER_NET_OUT_MiB}" | bc -l`
                 #
                 # 查用户
-                USER_XINGMING=`grep -B 2 ${USER_PEER} ${SERVER_CONF_FILE} | head -n 1 | awk '{print $2}'`
+                USER_NAME=`grep -B 2 ${USER_PEER} ${SERVER_CONF_FILE} | head -n 1 | awk '{print $2}'`
                 USER_IP=`grep -B 2 ${USER_PEER} ${SERVER_CONF_FILE} | head -n 1 | awk '{print $3}'`
                 # 是否有握手信息
                 if [ ${USER_LATEST_HAND_SECOND} -ne 0 ]; then
                     USER_LATEST_HAND_SECOND_TIME=`date -d @${USER_LATEST_HAND_SECOND} +%H:%M:%S`
                     # 有握手信息
-                    echo "| ${USER_XINGMING} | ${USER_LATEST_HAND_SECOND_TIME} | ${USER_NET_TOTAL_MiB} | ${USER_NET_IN_MiB} | ${USER_NET_OUT_MiB} | ${USER_IP} | ${USER_ENDPOINT_IP} | " >> ${WG_STATUS_REPORT_FILE}
+                    echo "| ${USER_NAME} | ${USER_LATEST_HAND_SECOND_TIME} | ${USER_NET_TOTAL_MiB} | ${USER_NET_IN_MiB} | ${USER_NET_OUT_MiB} | ${USER_IP} | ${USER_ENDPOINT_IP} | " >> ${WG_STATUS_REPORT_FILE}
                 fi
             done < ${WG_CURRENT_STATUS_FILE}
-            ${FORMAT_TABLE_SH}  --delimeter '|'  --title '|姓名|最后握手时间|总流量MiB|IN流量MiB|OUT流量MiB|用户IP|远程IP|'  --file ${WG_STATUS_REPORT_FILE}
+            ${FORMAT_TABLE_SH}  --delimeter '|'  --title '|用户名|最后握手时间|总流量MiB|IN流量MiB|OUT流量MiB|用户IP|远程IP|'  --file ${WG_STATUS_REPORT_FILE}
             exit
             ;;
         --)
