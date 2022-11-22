@@ -22,7 +22,7 @@ cd ${SH_PATH}
 
 
 if [ -e ${SERVER_CONF_FILE} ]; then
-    echo -e "\n峰哥说：服务器配置文件已存在，请勿重复设置，退出\n"
+    echo -e "\n猪猪侠警告：服务器配置文件已存在，请勿重复设置，退出\n"
     exit
 fi
 
@@ -30,7 +30,7 @@ fi
 # mod
 modprobe wireguard
 if [ "`lsmod | grep -q wireguard ; echo $?`" != '0' ]; then
-    echo -e "\n峰哥说：内核模块【wireguard】未加载，请检查！\n"
+    echo -e "\n猪猪侠警告：内核模块【wireguard】未加载，请检查！\n"
     exit 1
 fi
 

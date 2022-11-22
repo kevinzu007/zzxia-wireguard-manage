@@ -41,7 +41,7 @@ wg show "${WG_IF}" dump > "${WG_DAILY_STATUS_FILE}"
 sed -i '1d' "${WG_DAILY_STATUS_FILE}"
 
 
-echo '|日期|姓名|总流量MiB|IN流量MiB|OUT流量MiB|用户IP|远程IP|'  > ${YESTERDAY_WG_REPORT_FILE}
+echo '|日期|用户名|总流量MiB|IN流量MiB|OUT流量MiB|用户IP|远程IP|'  > ${YESTERDAY_WG_REPORT_FILE}
 #echo '| -- | -- | ------- | ------- | -------- | ---- | ---- |'  >> ${YESTERDAY_WG_REPORT_FILE}
 #
 while read LINE
@@ -64,21 +64,21 @@ do
     USER_NET_TOTAL_MiB=`echo "scale=1; ${USER_NET_IN_MiB} + ${USER_NET_OUT_MiB}" | bc -l`
     #
     # 查用户
-    USER_XINGMING=`grep -B 2 ${USER_PEER} ${SERVER_CONF_FILE} | head -n 1 | awk '{print $2}'`
+    USER_NAME=`grep -B 2 ${USER_PEER} ${SERVER_CONF_FILE} | head -n 1 | awk '{print $2}'`
     USER_IP=`grep -B 2 ${USER_PEER} ${SERVER_CONF_FILE} | head -n 1 | awk '{print $3}'`
     # 是否有握手信息
     if [ ${USER_LATEST_HAND_SECOND} -ne 0 ]; then
         # 有握手信息
         USER_LATEST_HAND_SECOND_TIME=`date -d @${USER_LATEST_HAND_SECOND} +%H:%M:%S`
         # 昨日报表
-        echo "| ${YESTERDAY_DATE} | ${USER_XINGMING} | ${USER_NET_TOTAL_MiB} | ${USER_NET_IN_MiB} | ${USER_NET_OUT_MiB} | ${USER_IP} | ${USER_ENDPOINT_IP} | " >> ${YESTERDAY_WG_REPORT_FILE}
+        echo "| ${YESTERDAY_DATE} | ${USER_NAME} | ${USER_NET_TOTAL_MiB} | ${USER_NET_IN_MiB} | ${USER_NET_OUT_MiB} | ${USER_IP} | ${USER_ENDPOINT_IP} | " >> ${YESTERDAY_WG_REPORT_FILE}
         # 写入总报表
-        echo "| ${YESTERDAY_DATE} | ${USER_XINGMING} | ${USER_NET_TOTAL_MiB} | ${USER_NET_IN_MiB} | ${USER_NET_OUT_MiB} | ${USER_IP} | ${USER_ENDPOINT_IP} | " >> ${WG_REPORT_FILE}
+        echo "| ${YESTERDAY_DATE} | ${USER_NAME} | ${USER_NET_TOTAL_MiB} | ${USER_NET_IN_MiB} | ${USER_NET_OUT_MiB} | ${USER_IP} | ${USER_ENDPOINT_IP} | " >> ${WG_REPORT_FILE}
     fi
 done < ${WG_DAILY_STATUS_FILE}
 #
 echo "昨日wg用户使用报告："
-#${FORMAT_TABLE_SH}  --delimeter '|'  --title '|日期|姓名|总流量MiB|IN流量MiB|OUT流量MiB|用户IP|远程IP|'  --file ${YESTERDAY_WG_REPORT_FILE}
+#${FORMAT_TABLE_SH}  --delimeter '|'  --title '|日期|用户名|总流量MiB|IN流量MiB|OUT流量MiB|用户IP|远程IP|'  --file ${YESTERDAY_WG_REPORT_FILE}
 ${FORMAT_TABLE_SH}  --delimeter '|'  --file ${YESTERDAY_WG_REPORT_FILE}
 
 
