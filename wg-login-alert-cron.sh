@@ -157,7 +157,7 @@ do
             USER_ENDPOINT_IP_LAST=$(sed -n "${LINE_NUM}p"  ${TODAY_WG_USER_LATEST_LOGIN_FILE}  |  awk -F '|' '{print $4}')
             USER_ENDPOINT_IP_LAST=$(echo ${USER_ENDPOINT_IP_LAST})
             USER_ENDPOINT_AREA=$(sed -n "${LINE_NUM}p"  ${TODAY_WG_USER_LATEST_LOGIN_FILE}  |  awk -F '|' '{print $6}')
-            USER_ENDPOINT_AREA=$(echo ${USER_ENDPOINT_IP_LAST})
+            USER_ENDPOINT_AREA=$(echo ${USER_ENDPOINT_AREA})
             #
             if [ "${USER_ENDPOINT_IP}" != "${USER_ENDPOINT_IP_LAST}" ]; then
                 # 和上次登录IP不一样
