@@ -59,20 +59,20 @@ TODAY_WG_USER_LATEST_LOGIN_FILE="/tmp/wg-user-first-login-today.txt"
 
 ## ----- 一般需要修改 -----
 # 钉钉
-export DINGDING_API_URL_FOR_LOGIN="https://oapi.dingtalk.com/robot/send?access_token=填上你的token在这里"
+export DINGDING_API_URL_FOR_LOGIN="https://oapi.dingtalk.com/robot/send?access_token=填上你的token在这里"      #-- 用来发送钉钉消息
 # server env
-SERVER_CONNECT_INFO='服务器IP:端口如51820'                  #--- wireguard服务器用以接受用户连接的IP与端口
+SERVER_CONNECT_INFO='服务器IP或域名:端口如51820'            #--- wireguard服务器用以接受用户连接的IP或域名及端口，用来生成用户的wg配置文件
 # user env
-USER_DNSs='192.168.11.3,192.168.11.4'                       #--- 用户的DNS
+USER_DNSs='192.168.11.3,192.168.11.4'                       #--- 用户的DNS，用来设置用户的DNS
 USER_ALOWED_IPs="${IP_PREFIX}.0/${IP_NETMASK},0.0.0.0/0"    #--- 用户端走VPN链路的网络地址范围（用来设置用户端路由）
 ```
 
 ### 4.2 服务器设置
 
-运行`wg-init-setup.sh`用于第一次配置服务器：
+运行`0-init-setup.sh`用于第一次配置服务器：
 
 ```bash
-# ./wg-init-setup.sh
+# ./0-init-setup.sh
 ```
 
 
@@ -128,7 +128,7 @@ USER_ALOWED_IPs="${IP_PREFIX}.0/${IP_NETMASK},0.0.0.0/0"    #--- 用户端走VPN
 添加计划任务：
 
 ```bash
-# ./wg-add-crontab.sh
+# ./1-add-crontab.sh
 ```
 
 查看报告：
