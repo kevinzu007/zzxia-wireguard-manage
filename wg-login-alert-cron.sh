@@ -31,13 +31,13 @@ TIME=${TIME:-`date +%Y-%m-%dT%H:%M:%S`}
 CURRENT_DATE=`date -d "${TIME}" +%Y-%m-%d`
 WG_LOGIN_STATUS_FILE="/tmp/wg-login-status.txt"
 #
-DINGDING_MARKDOWN_PY="${SH_PATH}/dingding_by_markdown_file-login.py"
+DINGDING_MARKDOWN_SH="${SH_PATH}/dingding_send_markdown-login.sh"
 
 
 # 必须软件jq
 if [ "`which jq >/dev/null 2>&1 ; echo $?`" != "0" ]; then
     echo -e "猪猪侠警告：${SH_NAME} - 请安装软件jq"
-    ${DINGDING_MARKDOWN_PY}  \
+    ${DINGDING_MARKDOWN_SH}  \
         --title "【Info:wg用户登录:`hostname -s`】"  \
         --message "$( echo -e "### 请安装软件jq" )"
     exit 1
@@ -48,7 +48,7 @@ fi
 # 登录钉钉消息
 F_LOGIN_SEND_DINGDING()
 {
-    ${DINGDING_MARKDOWN_PY}  \
+    ${DINGDING_MARKDOWN_SH}  \
         --title "【Info:wg登录:`hostname -s`】"  \
         --message "$( echo -e "### 用户：${USER_NAME} \n### 最近握手时间：${USER_LATEST_HAND_SECOND_TIME} \n### WG_IP：${USER_IP} \n### 远程IP：${USER_ENDPOINT_IP} \n### 地理位置：${USER_ENDPOINT_AREA} \n\n" )"
 }
@@ -56,7 +56,7 @@ F_LOGIN_SEND_DINGDING()
 # 登录钉钉消息
 F_NEW_IP_SEND_DINGDING()
 {
-    ${DINGDING_MARKDOWN_PY}  \
+    ${DINGDING_MARKDOWN_SH}  \
         --title "【Info:wg登录:`hostname -s`】"  \
         --message "$( echo -e "### 用户：${USER_NAME} \n### 新远程IP：${USER_ENDPOINT_IP} \n### 地理位置：${USER_ENDPOINT_AREA} \n\n" )"
 }
@@ -64,7 +64,7 @@ F_NEW_IP_SEND_DINGDING()
 # 离线钉钉消息
 F_OFFLINE_SEND_DINGDING()
 {
-    ${DINGDING_MARKDOWN_PY}  \
+    ${DINGDING_MARKDOWN_SH}  \
         --title "【Info:wg用户离线:`hostname -s`】"  \
         --message "$( echo -e "### 用户：${USER_NAME} \n### 最近握手时间：${USER_LATEST_HAND_SECOND_TIME} \n\n" )"
 }
