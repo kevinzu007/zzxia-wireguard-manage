@@ -1,7 +1,7 @@
 # zzxia-wireguard-manage
 
 ## 1 介绍
-wireguard VPN 服务器管理工具。提供服务器配置、重启、警报、报表等功能；提供用户的列出、添加、删除、导出配置、二维码分享等功能
+wireguard 服务器管理工具。提供服务器配置、重启、警报、报表等功能；提供用户的列出、添加、删除、导出配置、二维码分享等功能
 
 ### 1.1 功能：
 1. 配置服务器
@@ -64,7 +64,7 @@ export DINGDING_API_URL_FOR_LOGIN="https://oapi.dingtalk.com/robot/send?access_t
 SERVER_CONNECT_INFO='服务器IP或域名:端口如51820'            #--- wireguard服务器用以接受用户连接的IP或域名及端口，用来生成用户的wg配置文件
 # user env
 USER_DNSs='192.168.11.3,192.168.11.4'                       #--- 用户的DNS，用来设置用户的DNS
-USER_ALOWED_IPs="${IP_PREFIX}.0/${IP_NETMASK},0.0.0.0/0"    #--- 用户端走VPN链路的网络地址范围（用来设置用户端路由）
+USER_ALOWED_IPs="${IP_PREFIX}.0/${IP_NETMASK},0.0.0.0/0"    #--- 用户端走Wireguard链路的网络地址范围（用来设置用户端路由）
 ```
 
 ### 4.2 服务器设置
