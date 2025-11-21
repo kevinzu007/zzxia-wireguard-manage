@@ -1,7 +1,7 @@
 # zzxia-wireguard-manage
 
 #### Description
-wireguard VPN 服务器管理工具。提供用的列出、添加、删除、配置、重启功能
+wireguard 服务器管理工具。提供用的列出、添加、删除、配置、重启功能
 
 #### Software Architecture
 Software architecture description
