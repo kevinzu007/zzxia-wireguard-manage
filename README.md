@@ -31,7 +31,7 @@ Linux shell
 ## 3 安装教程
 
 - 克隆下来即可
-- wireguard服务器的安装方法请参考官网`https://www.wireguard.com/install/`
+- wireguard服务器的安装方法请参考官网
 
 
 ## 4 使用说明
