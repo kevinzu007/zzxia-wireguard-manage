@@ -1,5 +1,5 @@
 #!/bin/bash
-# 修改人：zhf_sy
+# 修改人：猪猪侠
 # Test On: CentOS 7
 #
 # 原作者信息如下：
@@ -30,6 +30,8 @@
 # +----+------+---------------+
 
 
+# 禁用通配符展开，防止参数中的 * 变成文件名列表
+set -f
 
 # sh
 SH_NAME=${0##*/}
@@ -45,23 +47,33 @@ F_HELP()
 {
     echo "
     用途：将数据输出为表格
+    特征码：
+        ${GAN_WHAT_FUCK:-'未命名'}
+    权限要求：
+        ${NEED_PRIVILEGES:-'未指定'}
     依赖：
     注意：
-    用法:
-        $0 [-h|--help]
-        $0 <-d|--delimeter {分隔符}>  <-t|--title {字段名1, 字段名2, ...}>  <-r|--row {值1, 值2, ...}>  <-f|--file {文件x}    #--- 默认分隔符为【,】
+        * 输入命令时，参数顺序不分先后
+    用法：
+        $0  -h|--help
+        $0  [{-d|--delimeter <分隔符>}]  [{-t|--title <字段名1, 字段名2, ...>}]  [{-r|--row <值1, 值2, ...>}]  [{-f|--file <文件x>}]    #--- 默认分隔符为【,】
+    参数规范：
+        无包围符号 ：-a                : 必选【选项】
+                   ：val               : 必选【参数值】
+                   ：val1 val2 -a -b   : 必选【选项或参数值】，且不分先后顺序
+        []         ：[-a]              : 可选【选项】
+                   ：[val]             : 可选【参数值】
+        <>         ：<val>             : 需替换的具体值（用户必须提供）
+        %%         ：%val%             : 通配符（包含匹配，如%error%匹配error_code）
+        |          ：val1|val2|<valn>  : 多选一
+        {}         ：{-a <val>}        : 必须成组出现【选项+参数值】，且保持顺序
+                   ：{val1 val2}       : 必须成组的【参数值组合】，且必须按顺序提供
     参数说明：
-        \$0   : 代表脚本本身
-        []   : 代表是必选项
-        <>   : 代表是可选项
-        |    : 代表左右选其一
-        {}   : 代表参数值，请替换为具体参数值
-        %    : 代表通配符，非精确值，可以被包含
-        #
-        -d|--delimeter  : 表格分隔符，默认分隔符为【,】
-        -t|--title      ：标题，例如： 'aa, bb,cc'
-        -r|--row        : 行，例如：'aaaa, bbbbb,cccc'
-        -f|--file       : 表格文件名
+        -h|--help                            此帮助
+        -d|--delimeter <分隔符>              表格分隔符，默认分隔符为【,】
+        -t|--title <字段名1, 字段名2, ...>   标题，例如：'aa, bb,cc'
+        -r|--row <值1, 值2, ...>             行，例如：'aaaa, bbbbb,cccc'
+        -f|--file <文件>                     表格文件名
     示例：
         #
         $0          -f 文件1          #--- 默认分隔符，标题与内容皆取自【文件1】
@@ -85,10 +97,11 @@ function set_title(){
     for i in "$@"
     do
         title+="|${i}${sep}"
-        let column_count++
+        #let column_count++
+        (( column_count++ ))
     done
     title+="|\n"
-    seg=`segmentation`
+    seg=$(segmentation)
     title="${seg}${title}${seg}"
     content=""
 }
@@ -98,11 +111,11 @@ function set_title(){
 function check_line(){
     if [ -n "$line" ]
     then
-        c_c=$(echo $line|tr -cd "${sep}"|wc -c)
-        difference=$((${column_count}-${c_c}))
+        c_c=$(echo "$line" | tr -cd "${sep}" | wc -c)
+        difference=$((column_count - c_c))
         if [ $difference -gt 0 ]
         then
-            line+=$(seq -s " " $difference|sed -r s/[0-9]\+/\|${sep}/g|sed -r  s/${sep}\ /${sep}/g)
+            line+=$(seq -s " " "$difference" | sed -r s/[0-9]\+/\|${sep}/g | sed -r  s/${sep}\ /${sep}/g)
         fi
         content+="${line}|\n"
     fi
@@ -140,7 +153,7 @@ function append_line(){
 function segmentation(){
     local seg=""
     local i
-    for i in $(seq $column_count)
+    for i in $(seq "$column_count")
     do
         seg+="+${sep}"
     done
@@ -152,21 +165,23 @@ function segmentation(){
 
 # 整合输出
 function output_table(){
-    if [ ! -n "${title}" ]
+    if [ -z "${title}" ]
     then
         echo "未设置表头，退出" && return 1
     fi
     append_line
     table="${title}${content}$(segmentation)"
     # ◘ : 空格
-    table=`echo "${table}" | sed 's/◘/ /g'`
+    table=$(echo "${table}" | sed 's/◘/ /g')
     # ✖ : 空
-    table=`echo "${table}" | sed 's/✖//g'`
+    table=$(echo "${table}" | sed 's/✖//g')
+    #
     #echo -e "${table}"
     #echo -e $table|column -s "${sep}" -t|awk '{if($0 ~ /^+/){gsub(" ","-",$0);print $0}else{gsub("\\(\\*\\)","\033[31m(*)\033[0m",$0);print $0}}'
     #echo -e $table|column -s "${sep}" -t|awk '{if($0 ~ /^+/){gsub(" ","-",$0);print $0}else{gsub("\\*","\033[31m*\033[0m",$0);gsub("错误","\033[31m错误\033[0m",$0);gsub("失败","\033[31m失败\033[0m",$0);gsub("成功","\033[32;1m成功\033[0m",$0);print $0}}'
-    echo -e $table|column -s "${sep}" -t|awk '{if($0 ~ /^\+/){gsub(" ","-",$0);print $0}else{gsub("\\*","\033[31m*\033[0m",$0);gsub("错误","\033[31m错误\033[0m",$0);gsub("失败","\033[31m失败\033[0m",$0);gsub("成功","\033[32;1m成功\033[0m",$0);print $0}}'
     #echo -e $table|column -s "${sep}" -t|awk '{if($0 ~ /^+/){gsub(" ","-",$0);print $0}else{gsub("\\*","\033[31m*\033[0m",$0);gsub("错误","\033[31m错误\033[0m",$0);gsub("失败","\033[31m失败\033[0m",$0);gsub("成功","\033[32;1m成功\033[0m",$0);gsub("已发布","\033[32;1m已发布\033[0m",$0);print $0}}'
+    #
+    echo -e "$table" | column -s "${sep}" -t | awk '{if($0 ~ /^\+/){gsub(" ","-",$0);print $0}else{gsub("\\*","\033[31m*\033[0m",$0);gsub("错误","\033[31m错误\033[0m",$0);gsub("失败","\033[31m失败\033[0m",$0);gsub("成功","\033[32;1m成功\033[0m",$0);print $0}}'
 }
 
 
@@ -191,15 +206,15 @@ function output_table(){
 
 # 示例2：
 #set_title 项目 状态
-#append_line  gclife-renewal-front*  "Build 成功(*)"
-#append_line  gclife-renewal-front  "Build(*) 成功"
+#append_line  gc-renewal-front*  "Build 成功(*)"
+#append_line  gc-renewal-front  "Build(*) 成功"
 #output_table
 
 
 
 
 # 参数检查
-TEMP=`getopt  -o hd:t:r:f:  -l help,delimeter:,title:,row:,file: -- "$@"`
+TEMP=$(getopt -o hd:t:r:f: -l help,delimeter:,title:,row:,file: -- "$@")
 if [ $? != 0 ]; then
     echo -e "\n猪猪侠警告：参数不合法，请查看帮助【$0 --help】\n"
     exit 1
@@ -209,13 +224,21 @@ eval set -- "${TEMP}"
 
 
 # 获取次要命令参数
-SH_ARGS_NUM=$#
-SH_ARGS[0]="占位"
-for ((i=1;i<=SH_ARGS_NUM;i++)); do
-    eval K=\${${i}}
-    SH_ARGS[${i}]=${K}
-    #echo SH_ARGS数组${i}列的值是: ${SH_ARGS[${i}]}
-done
+#
+#SH_ARGS_NUM=$#
+#SH_ARGS[0]="占位"
+#for ((i=1;i<=SH_ARGS_NUM;i++)); do
+#    #eval K=\${${i}}
+#    K="${!i}"
+#    #SH_ARGS[${i}]=${K}
+#    SH_ARGS[i]="${K}"
+#    #echo SH_ARGS数组${i}列的值是: ${SH_ARGS[${i}]}
+#done
+#
+# 改成这样：
+declare -a SH_ARGS    #-- 定义数组
+SH_ARGS=("占位" "$@")    #-- 从 $1 开始将参数放入数组，且索引从 0 开始，0 位放“占位”，后面放命令参数
+
 #
 SH_ARGS_ARR_NUM=${#SH_ARGS[@]}
 for ((i=1;i<SH_ARGS_ARR_NUM;i++))
@@ -226,6 +249,7 @@ do
             exit
             ;;
         -d|--delimeter)
+            # (( )) vs $(( )) 怎么选？简单来说：如果你只想执行运算，选 (( ))；如果你需要拿到运算结果，选 $(( ))
             j=$((i+1))
             J=${SH_ARGS[$j]}
             T_DELIMETER=$J
@@ -254,28 +278,28 @@ F_LINE()
 {
     LINE="$1"
     FILED_OK=''
-    FILED_SUM=`echo "${LINE}" | grep -o "${T_DELIMETER}" | wc -l`
+    FILED_SUM=$(echo "${LINE}" | grep -o "${T_DELIMETER}" | wc -l)
     for ((i=0;i<=FILED_SUM;i++))
     do
-        let k=$i+1
-        FILED=`echo "${LINE}" | cut -d "${T_DELIMETER}" -f $k`
-        FILED=`echo ${FILED}`
+        #let k=$i+1
+        (( k=i+1 ))    #-- (( )) vs $(( )) 怎么选？简单来说：如果你只想执行运算，选 (( ))；如果你需要拿到运算结果，选 $(( ))
+        FILED=$(echo "${LINE}" | cut -d "${T_DELIMETER}" -f $k)
+        FILED=$(echo ${FILED})     #-- ${FILED}不能加引号，正规表格会异常，但是如果不加，遇到表格内容为'*'，则会被展开，为避免，所以'set -f'阻止展开
         # 空格
-        FILED=`echo "${FILED}" | sed 's/ /◘/g'`
+        FILED=$(echo "${FILED}" | sed 's/ /◘/g')
         # 空
-        [ "x${FILED}" = "x" ] && FILED='✖'
+        [ -z "${FILED}" ] && FILED='✖'
         # 组合
         FILED_OK="${FILED_OK}  ${FILED}"
     done
-    echo  "${FILED_OK}"
+    echo "${FILED_OK}"
 }
 
 
 # title
 if [ -n "${T_TITLE}" ]; then
-    set_title '序号'  `F_LINE "${T_TITLE}"`
+    set_title '序号' $(F_LINE "${T_TITLE}")    #-- $()不能加引号，别信语法检查，因为设计要求，加了表格格式会有错
 fi
-
 
 
 #
@@ -297,22 +321,24 @@ do
                 exit 1
             fi
             T_ROW="$2"
-            append_line  "$i"  `F_LINE "${T_ROW}"`
-            let i++
+            append_line "$i" $(F_LINE "${T_ROW}")    #-- $()不能加引号，别信语法检查
+            #let i++
+            (( i++ ))
             shift 2
             ;;
         -f|--file)
             T_FILE=$2
-            while read LINE
+            while read -r LINE
             do
                 if [ -n "${T_TITLE}" ]; then
-                    append_line  "$i"  `F_LINE "${LINE}"`
-                    let i++
+                    append_line "$i" $(F_LINE "${LINE}")    #-- $()不能加引号，别信语法检查，这里不能加双引号，因为设计要求，加了表格格式会有错
+                    #let i++
+                    (( i++ ))
                 else
-                    set_title  '序号'  `F_LINE "${LINE}"`
+                    set_title '序号' $(F_LINE "${LINE}")    #-- $()不能加引号，别信语法检查
                     T_TITLE="现在有了"
                 fi
-            done < ${T_FILE}
+            done < "${T_FILE}"
             shift 2
             ;;
         --)
@@ -329,8 +355,4 @@ done
 
 # 输出
 output_table
-
-
-
-
 
