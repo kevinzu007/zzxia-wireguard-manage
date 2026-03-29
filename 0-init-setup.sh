@@ -20,8 +20,11 @@ cd "${SH_PATH}"
 . "${SH_PATH}/env.sh"
 . "${SH_PATH}/functions.sh"
 
-
-
+# 支持指定接口名，如：./0-init-setup.sh wg1
+if [ -n "$1" ]; then
+    WG_IF="$1"
+    F_REFRESH_WG_PATHS
+fi
 if [ -e "${SERVER_CONF_FILE}" ]; then
     echo -e "\n猪猪侠警告：服务器配置文件已存在，请勿重复设置，退出\n"
     exit

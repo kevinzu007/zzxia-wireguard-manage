@@ -19,6 +19,28 @@ F_LOG()
 }
 
 
+# --- 多接口支持 ---
+
+# 切换 WG_IF 后重新计算衍生路径
+# 用法：WG_IF=wg1; F_REFRESH_WG_PATHS
+F_REFRESH_WG_PATHS()
+{
+    SERVER_CONF_FILE="${SERVER_CONF_FILE_PATH}/${WG_IF}.conf"
+    # 尝试接口专用密钥，不存在则回退到通用 private.key
+    local iface_key="${SERVER_CONF_FILE_PATH}/${WG_IF}-private.key"
+    local generic_key="${SERVER_CONF_FILE_PATH}/private.key"
+    if [ -f "${iface_key}" ]; then
+        SERVER_PRIVATE_KEY="${iface_key}"
+    elif [ -f "${generic_key}" ]; then
+        SERVER_PRIVATE_KEY="${generic_key}"
+    else
+        # 新接口：使用接口专用路径（init-setup 将创建此文件）
+        SERVER_PRIVATE_KEY="${iface_key}"
+    fi
+    TODAY_WG_USER_LATEST_LOGIN_FILE="/tmp/wg-user-latest-login-today-${WG_IF}.txt"
+}
+
+
 # --- WireGuard dump 解析 ---
 
 # 解析 wg show dump 单行数据，设置全局变量
