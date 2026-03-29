@@ -33,7 +33,7 @@ F_HELP()
     依赖：
     注意：推荐使用新的统一通知脚本 send_markdown_msg.sh，支持多平台（钉钉、企业微信、飞书）
           本脚本将继续维护以保持向后兼容性
-    用法:
+    用法：
         $0  -h|--help
         $0  [{-w|--webhook <Webhook地址>}]  {-t|--title <消息标题>}  {-m|--message <消息内容>}
     参数规范：
@@ -48,11 +48,10 @@ F_HELP()
         {}         ：{-a <val>}        : 必须成组出现【选项+参数值】，且保持顺序
                    ：{val1 val2}       : 必须成组的【参数值组合】，且必须按顺序提供
     参数说明：
-        #
-        -h|--help        此帮助
-        -w|--webhook     钉钉webhook地址，如果未设置，则从从环境变量中继承（\${DINGDING_WEBHOOK_API}）
-        -t|--title       消息标题
-        -m|--message     消息内容
+        -h|--help                    此帮助
+        -w|--webhook <Webhook地址>   钉钉webhook地址，如果未设置，则从环境变量中继承（\${DINGDING_WEBHOOK_API}）
+        -t|--title <消息标题>        消息标题
+        -m|--message <消息内容>      消息内容
     示例:
         $0  -t 'sssss'       -m \"\$(cat xxx.md)\"
         $0  --title 'sssss'  --message \"\$(cat xxx.md)\"                                                   #-- 从文件获取
