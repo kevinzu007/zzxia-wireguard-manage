@@ -14,14 +14,15 @@ umask 0077
 # sh
 SH_NAME=${0##*/}
 SH_PATH=$( cd "$( dirname "$0" )" && pwd )
-cd ${SH_PATH}
+cd "${SH_PATH}"
 
 # env
-. ${SH_PATH}/env.sh
+. "${SH_PATH}/env.sh"
+. "${SH_PATH}/functions.sh"
 
 
 
-if [ -e ${SERVER_CONF_FILE} ]; then
+if [ -e "${SERVER_CONF_FILE}" ]; then
     echo -e "\n猪猪侠警告：服务器配置文件已存在，请勿重复设置，退出\n"
     exit
 fi
@@ -29,33 +30,34 @@ fi
 
 # mod
 modprobe wireguard
-if [ "`lsmod | grep -q wireguard ; echo $?`" != '0' ]; then
+if [ "$(lsmod | grep -q wireguard ; echo $?)" != '0' ]; then
     echo -e "\n猪猪侠警告：内核模块【wireguard】未加载，请检查！\n"
     exit 1
 fi
 
 
 # 私钥
-if [ ! -f ${SERVER_PRIVATE_KEY} ]; then
-    wg genkey > ${SERVER_PRIVATE_KEY}   # 生成私钥
+if [ ! -f "${SERVER_PRIVATE_KEY}" ]; then
+    wg genkey > "${SERVER_PRIVATE_KEY}"   # 生成私钥
 fi
 
 # 设置服务器信息
-ip link add ${WG_IF} type wireguard
-ip address add ${IP_PREFIX}.1/${IP_NETMASK} dev ${WG_IF}
-wg  set ${WG_IF}  listen-port 51820  private-key ${SERVER_PRIVATE_KEY}
+ip link add "${WG_IF}" type wireguard
+ip address add "${IP_PREFIX}.1/${IP_NETMASK}" dev "${WG_IF}"
+wg  set "${WG_IF}"  listen-port 51820  private-key "${SERVER_PRIVATE_KEY}"
 
 # 启动服务
-ip link set ${WG_IF} up
+ip link set "${WG_IF}" up
 
 # 保存配置到/etc/wireguard/wgN.conf
-touch ${SERVER_CONF_FILE}
-wg-quick save ${WG_IF}
+touch "${SERVER_CONF_FILE}"
+wg-quick save "${WG_IF}"
 
 # 重启
-wg-quick down ${WG_IF}
-wg-quick up ${WG_IF}
+wg-quick down "${WG_IF}"
+wg-quick up "${WG_IF}"
 
+F_LOG "INFO" "服务器初始化完成：接口=${WG_IF}, 网段=${IP_PREFIX}.0/${IP_NETMASK}"
 
 
 ## 防火墙开启
