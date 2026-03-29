@@ -17,4 +17,5 @@
 user_config_info/*
 env.sh
 log/
+report/
 
