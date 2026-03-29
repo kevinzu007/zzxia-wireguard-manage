@@ -31,7 +31,7 @@ TIME=${TIME:-`date +%Y-%m-%dT%H:%M:%S`}
 CURRENT_DATE=`date -d "${TIME}" +%Y-%m-%d`
 WG_LOGIN_STATUS_FILE="/tmp/wg-login-status.txt"
 #
-DINGDING_MARKDOWN_SH="${SH_PATH}/dingding_send_markdown-login.sh"
+DINGDING_MARKDOWN_SH="${SH_PATH}/dingding_send_markdown.sh"
 
 
 # 必须软件jq
