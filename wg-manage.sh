@@ -18,6 +18,8 @@ cd "${SH_PATH}"
 #......
 
 
+# 本地env
+SERVER_PUBKEY=$(wg pubkey < "${SERVER_PRIVATE_KEY}")  #--- wireguard服务器公钥
 # user_config
 USER_CONFIG_PATH="${SH_PATH}/user_config_info"
 [ ! -d "${USER_CONFIG_PATH}" ] && mkdir "${USER_CONFIG_PATH}"
@@ -49,12 +51,12 @@ F_HELP()
     注意：
     用法：
         $0  -h|--help
-        $0  [{-i|--interface <接口名>}]  -l|--list
-        $0  [{-i|--interface <接口名>}]  {-a|--add <用户名>}  [<IP第4段>]
-        $0  [{-i|--interface <接口名>}]  {-r|--rm <用户名>}
-        $0  [{-i|--interface <接口名>}]  {-o|--output-config <用户名>}
-        $0  [{-i|--interface <接口名>}]  -R|--reload
-        $0  [{-i|--interface <接口名>}]  -s|--status
+        $0  -l|--list
+        $0  {-a|--add <用户名>}  [<IP第4段>]
+        $0  {-r|--rm <用户名>}
+        $0  {-o|--output-config <用户名>}
+        $0  -R|--reload
+        $0  -s|--status
     参数规范：
         无包围符号 ：-a                : 必选【选项】
                    ：val               : 必选【参数值】
@@ -68,7 +70,6 @@ F_HELP()
                    ：{val1 val2}       : 必须成组的【参数值组合】，且必须按顺序提供
     参数说明：
         -h|--help                    此帮助
-        -i|--interface <接口名>      指定WireGuard接口（默认：${WG_IF}）
         -l|--list                    列出现有用户
         -a|--add <用户名>            添加用户
         -r|--rm <用户名>             删除用户
@@ -88,9 +89,6 @@ F_HELP()
         $0  -R              #--- 重启服务器
         #
         $0  -s              #--- 查看服务器状态
-        #
-        $0  -i wg1  -l      #--- 列出wg1接口的用户清单
-        $0  -i wg1  -a 猪猪侠  #--- 在wg1接口添加用户
 "
 }
 
@@ -131,27 +129,13 @@ AllowedIPs = ${USER_ALOWED_IPs}
 
 
 
-TEMP=$(getopt -o hli:a:r:o:Rs  -l help,list,interface:,add:,rm:,output-config:,reload,status -- "$@")
+TEMP=$(getopt -o hla:r:o:Rs  -l help,list,add:,rm:,output-config:,reload,status -- "$@")
 if [ $? != 0 ]; then
     echo -e "\n猪猪侠警告：参数不合法，请查看帮助【$0 --help】\n"
     exit 1
 fi
 #
 eval set -- "${TEMP}"
-
-# 预扫描：检查 -i|--interface 参数，提前设置 WG_IF
-for ((idx=1; idx<=$#; idx++)); do
-    arg="${!idx}"
-    if [[ "${arg}" == "-i" || "${arg}" == "--interface" ]]; then
-        next_idx=$((idx+1))
-        WG_IF="${!next_idx}"
-        F_REFRESH_WG_PATHS
-        break
-    fi
-done
-
-# 本地env（依赖 WG_IF，必须在预扫描之后）
-SERVER_PUBKEY=$(wg pubkey < "${SERVER_PRIVATE_KEY}")  #--- wireguard服务器公钥
 
 
 
@@ -162,10 +146,6 @@ do
             shift
             F_HELP
             exit
-            ;;
-        -i|--interface)
-            # 已在预扫描中处理
-            shift 2
             ;;
         -l|--list)
             shift

@@ -33,8 +33,4 @@ echo "计划任务添加后如下："
 echo "------------------------------"
 crontab -l
 echo "------------------------------"
-echo
-echo "提示：如需管理多个WireGuard接口，手动添加如下cron条目："
-echo "  @reboot    WG_IF=wg1 . ${SH_PATH}/env.sh; /usr/bin/wg-quick up wg1"
-echo "  0 0 * * *  WG_IF=wg1 ${SH_PATH}/wg-daily-report-cron.sh"
-echo "  * * * * *  WG_IF=wg1 ${SH_PATH}/wg-login-alert-cron.sh"
+
