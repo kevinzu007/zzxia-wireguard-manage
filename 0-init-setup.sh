@@ -20,6 +20,7 @@ cd "${SH_PATH}"
 . "${SH_PATH}/env.sh"
 . "${SH_PATH}/functions.sh"
 
+F_CHECK_ROOT
 
 
 if [ -e "${SERVER_CONF_FILE}" ]; then
