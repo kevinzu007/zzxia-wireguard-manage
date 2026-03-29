@@ -40,9 +40,9 @@ F_HELP()
         - 如果不指定平台，脚本会尝试从webhook URL自动检测
         - 企业微信的markdown支持有限（仅支持标题、加粗、链接、代码块）
         - 飞书使用富文本格式，会自动转换基础markdown语法
-    用法:
-        $0 -h|--help
-        $0 [{-p|--platform dingding|weixin|feishu}] [{-w|--webhook <Webhook地址>}] {-t|--title <消息标题>} {-m|--message <消息内容>}
+    用法：
+        $0  -h|--help
+        $0  [{-p|--platform dingding|weixin|feishu}]  [{-w|--webhook <Webhook地址>}]  {-t|--title <消息标题>}  {-m|--message <消息内容>}
     参数规范：
         无包围符号 ：-a                : 必选【选项】
                    ：val               : 必选【参数值】
@@ -52,25 +52,24 @@ F_HELP()
         <>         ：<val>             : 需替换的具体值（用户必须提供）
         %%         ：%val%             : 通配符（包含匹配，如%error%匹配error_code）
         |          ：val1|val2|<valn>  : 多选一
-        {}         ：{-a <val>}        : 必须成组出现【选项+参数值】
+        {}         ：{-a <val>}        : 必须成组出现【选项+参数值】，且保持顺序
                    ：{val1 val2}       : 必须成组的【参数值组合】，且必须按顺序提供
     参数说明：
-        #
-        -h|--help        此帮助
-        -p|--platform    指定平台：dingding(钉钉)、weixin(企业微信)、feishu(飞书)
-                        如不指定，将从webhook URL自动检测，或使用环境变量 DEFAULT_NOTIFICATION_PLATFORM
-        -w|--webhook     Webhook地址，可选，默认从环境变量中继承：
-                        钉钉：DINGDING_WEBHOOK_API
-                        企业微信：WEIXIN_WEBHOOK_API
-                        飞书：FEISHU_WEBHOOK_API
-        -t|--title       消息标题
-        -m|--message     消息内容（支持markdown格式）
+        -h|--help                                此帮助
+        -p|--platform dingding|weixin|feishu     指定平台：dingding(钉钉)、weixin(企业微信)、feishu(飞书)
+                                                 如不指定，将从webhook URL自动检测，或使用环境变量 DEFAULT_NOTIFICATION_PLATFORM
+        -w|--webhook <Webhook地址>               Webhook地址，可选，默认从环境变量中继承：
+                                                 钉钉：DINGDING_WEBHOOK_API
+                                                 企业微信：WEIXIN_WEBHOOK_API
+                                                 飞书：FEISHU_WEBHOOK_API
+        -t|--title <消息标题>                    消息标题
+        -m|--message <消息内容>                  消息内容（支持markdown格式）
     环境变量：
-        DINGDING_WEBHOOK_API                              钉钉webhook地址
-        WEIXIN_WEBHOOK_API                                企业微信webhook地址
-        FEISHU_WEBHOOK_API                                飞书webhook地址
-        DEFAULT_NOTIFICATION_PLATFORM                     默认平台(dingding/weixin/feishu)
-    示例:
+        DINGDING_WEBHOOK_API                     钉钉webhook地址
+        WEIXIN_WEBHOOK_API                       企业微信webhook地址
+        FEISHU_WEBHOOK_API                       飞书webhook地址
+        DEFAULT_NOTIFICATION_PLATFORM            默认平台(dingding/weixin/feishu)
+    示例：
         # 使用钉钉发送
         $0  -p dingding  -t 'Test Title'  -m '### 测试消息'
         # 使用企业微信发送
