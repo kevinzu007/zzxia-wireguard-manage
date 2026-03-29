@@ -22,6 +22,8 @@ cd "${SH_PATH}"
 . /etc/profile         #--- 计划任务需要
 . "${SH_PATH}/env.sh"
 . "${SH_PATH}/functions.sh"
+
+F_CHECK_ROOT
 #TODAY_WG_USER_LATEST_LOGIN_FILE=
 
 

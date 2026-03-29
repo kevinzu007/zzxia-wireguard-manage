@@ -15,6 +15,8 @@ cd "${SH_PATH}"
 # env
 . "${SH_PATH}/env.sh"
 . "${SH_PATH}/functions.sh"
+
+F_CHECK_ROOT
 #......
 
 
