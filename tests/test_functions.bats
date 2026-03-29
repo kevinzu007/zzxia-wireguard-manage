@@ -85,36 +85,3 @@ EOF
 
     rm -rf "${SH_PATH}"
 }
-
-@test "F_REFRESH_WG_PATHS 正确更新衍生路径" {
-    export SH_PATH=$(mktemp -d)
-    export SERVER_CONF_FILE_PATH=$(mktemp -d)
-    source "${SH_DIR}/functions.sh"
-
-    # 模拟默认接口
-    WG_IF="wg0"
-    # 创建通用密钥文件
-    touch "${SERVER_CONF_FILE_PATH}/private.key"
-
-    F_REFRESH_WG_PATHS
-
-    [ "${SERVER_CONF_FILE}" = "${SERVER_CONF_FILE_PATH}/wg0.conf" ]
-    [ "${SERVER_PRIVATE_KEY}" = "${SERVER_CONF_FILE_PATH}/private.key" ]
-    [[ "${TODAY_WG_USER_LATEST_LOGIN_FILE}" == *"wg0"* ]]
-
-    # 切换到 wg1
-    WG_IF="wg1"
-    F_REFRESH_WG_PATHS
-
-    [ "${SERVER_CONF_FILE}" = "${SERVER_CONF_FILE_PATH}/wg1.conf" ]
-    # 无接口专用密钥时回退到通用密钥
-    [ "${SERVER_PRIVATE_KEY}" = "${SERVER_CONF_FILE_PATH}/private.key" ]
-    [[ "${TODAY_WG_USER_LATEST_LOGIN_FILE}" == *"wg1"* ]]
-
-    # 创建接口专用密钥后优先使用
-    touch "${SERVER_CONF_FILE_PATH}/wg1-private.key"
-    F_REFRESH_WG_PATHS
-    [ "${SERVER_PRIVATE_KEY}" = "${SERVER_CONF_FILE_PATH}/wg1-private.key" ]
-
-    rm -rf "${SH_PATH}" "${SERVER_CONF_FILE_PATH}"
-}

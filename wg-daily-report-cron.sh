@@ -29,8 +29,8 @@ WG_DAILY_STATUS_FILE=$(mktemp /tmp/wg-daily-status.XXXXXX)
 trap 'rm -f "${WG_DAILY_STATUS_FILE}"' EXIT
 #
 [ -d "${SH_PATH}/report" ] || mkdir "${SH_PATH}/report"
-YESTERDAY_WG_REPORT_FILE="${SH_PATH}/report/wg-daily-report-${WG_IF}---${YESTERDAY_DATE}.md"
-WG_REPORT_FILE="${SH_PATH}/report/wg-report-${WG_IF}.list"
+YESTERDAY_WG_REPORT_FILE="${SH_PATH}/report/wg-daily-report---${YESTERDAY_DATE}.md"
+WG_REPORT_FILE="${SH_PATH}/report/wg-report.list"
 # sh
 FORMAT_TABLE_SH="${SH_PATH}/format_table.sh"
 
