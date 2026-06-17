@@ -38,8 +38,8 @@ F_HELP()
     依赖：
     注意：
         - 如果不指定平台，脚本会尝试从webhook URL自动检测
-        - 企业微信的markdown支持有限（仅支持标题、加粗、链接、代码块）
-        - 飞书使用富文本格式，会自动转换基础markdown语法
+        - 企业微信使用 markdown_v2 类型，支持标题、加粗、斜体、链接、代码块、表格、列表、分割线、图片等
+        - 飞书使用 interactive 卡片 + markdown 标签，支持标准 Markdown 语法
     用法：
         $0  -h|--help
         $0  [{-p|--platform dingding|weixin|feishu}]  [{-w|--webhook <Webhook地址>}]  {-t|--title <消息标题>}  {-m|--message <消息内容>}
@@ -127,51 +127,51 @@ F_SEND_DINGDING()
     curl -s -X POST -H "${send_header}" -d "${send_data}" "${webhook}" || { echo "Error sending DingTalk message" >&2 ; return 1; }
 }
 
-# 发送企业微信消息
+# 发送企业微信消息（消息推送 markdown_v2 类型）
 F_SEND_WEIXIN()
 {
     local webhook="$1"
     local title="$2"
     local message="$3"
-    
+
     local send_header="Content-Type: application/json; charset=utf-8"
-    printf -v full_message '### %s\n---\n%s\n\n---\n\n发自: **%s**\n时间: %s' \
+    printf -v full_message '# %s\n\n---\n\n%s\n\n---\n\n发自: **%s**\n时间: %s' \
         "${title}" "${message}" "${HOSTNAME}" "${DATETIME}"
-    
+
     if command -v jq > /dev/null 2>&1; then
         send_data=$(jq -n \
             --arg text "${full_message}" \
-            '{msgtype: "markdown", markdown: {content: $text}}')
+            '{msgtype: "markdown_v2", markdown_v2: {content: $text}}')
     else
         _escaped_message=$(printf '%s' "${full_message}" | sed 's/\\/\\\\/g; s/"/\\"/g' | sed ':a;N;$!ba;s/\n/\\n/g')
-        send_data="{\"msgtype\": \"markdown\", \"markdown\": {\"content\": \"${_escaped_message}\"}}"
+        send_data="{\"msgtype\": \"markdown_v2\", \"markdown_v2\": {\"content\": \"${_escaped_message}\"}}"
     fi
-    
+
     curl -s -X POST -H "${send_header}" -d "${send_data}" "${webhook}" || { echo "Error sending WeChat Work message" >&2 ; return 1; }
 }
 
-# 发送飞书消息
+# 发送飞书消息（interactive 卡片 JSON 2.0 + markdown 标签）
 F_SEND_FEISHU()
 {
     local webhook="$1"
     local title="$2"
     local message="$3"
-    
+
     local send_header="Content-Type: application/json; charset=utf-8"
-    
-    # 飞书文本格式
-    printf -v full_message '%s\n---\n%s\n\n---\n\n发自: %s\n时间: %s' \
+    printf -v full_message '## %s\n\n---\n\n%s\n\n---\n\n发自: **%s**\n时间: %s' \
         "${title}" "${message}" "${HOSTNAME}" "${DATETIME}"
-    
+
     if command -v jq > /dev/null 2>&1; then
         send_data=$(jq -n \
+            --arg title "${title}" \
             --arg text "${full_message}" \
-            '{msg_type: "text", content: {text: $text}}')
+            '{msg_type: "interactive", card: {schema: "2.0", header: {title: {tag: "plain_text", content: $title}, template: "blue"}, body: {elements: [{tag: "markdown", content: $text}]}}}')
     else
+        _escaped_title=$(printf '%s' "${title}" | sed 's/\\/\\\\/g; s/"/\\"/g')
         _escaped_message=$(printf '%s' "${full_message}" | sed 's/\\/\\\\/g; s/"/\\"/g' | sed ':a;N;$!ba;s/\n/\\n/g')
-        send_data="{\"msg_type\": \"text\", \"content\": {\"text\": \"${_escaped_message}\"}}"
+        send_data="{\"msg_type\": \"interactive\", \"card\": {\"schema\": \"2.0\", \"header\": {\"title\": {\"tag\": \"plain_text\", \"content\": \"${_escaped_title}\"}, \"template\": \"blue\"}, \"body\": {\"elements\": [{\"tag\": \"markdown\", \"content\": \"${_escaped_message}\"}]}}}"
     fi
-    
+
     curl -s -X POST -H "${send_header}" -d "${send_data}" "${webhook}" || { echo "Error sending Feishu message" >&2 ; return 1; }
 }
 
