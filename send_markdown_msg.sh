@@ -61,15 +61,11 @@ F_HELP()
         {[]}       : {[-a val1] val2}  : 总体必选，使用此项时，可选'-a val1'，必选'val2'，必须成组出现，且保持顺序
         arg1[,...argn] : val1,val2,var3=val3 : 有一个参数或多个参数，用','分隔
     参数说明：
-        -h|--help                                此帮助
-        -p|--platform dingding|weixin|feishu     指定平台：dingding(钉钉)、weixin(企业微信)、feishu(飞书)
-                                                 如不指定，将从webhook URL自动检测，或使用环境变量 DEFAULT_NOTIFICATION_PLATFORM
-        -w|--webhook <Webhook地址>               Webhook地址，可选，默认从环境变量中继承：
-                                                 钉钉：DINGDING_WEBHOOK_API
-                                                 企业微信：WEIXIN_WEBHOOK_API
-                                                 飞书：FEISHU_WEBHOOK_API
-        -t|--title <消息标题>                    消息标题
-        -m|--message <消息内容>                  消息内容（支持markdown格式）
+        -h|--help                               # 此帮助
+        -p|--platform dingding|weixin|feishu    # 指定平台，如不指定则从webhook URL自动检测
+        -w|--webhook <Webhook地址>               # Webhook地址，默认从环境变量继承
+        -t|--title <消息标题>                    # 消息标题
+        -m|--message <消息内容>                  # 消息内容（支持markdown格式）
     环境变量：
         DINGDING_WEBHOOK_API                    # 钉钉webhook地址
         WEIXIN_WEBHOOK_API                      # 企业微信webhook地址
