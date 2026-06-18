@@ -30,30 +30,36 @@ send_message=""
 F_HELP()
 {
     echo "
-    用途：将markdown格式的文本通过多平台机器人发送出去
+    用途：通过机器人Webhook发送Markdown消息，支持钉钉、企业微信、飞书
     特征码：
         ${GAN_WHAT_FUCK:-'未命名'}
     权限要求：
         ${NEED_PRIVILEGES:-'未指定'}
     依赖：
+        jq
+        curl
+        env.sh
     注意：
         - 如果不指定平台，脚本会尝试从webhook URL自动检测
         - 企业微信使用 markdown_v2 类型，支持标题、加粗、斜体、链接、代码块、表格、列表、分割线、图片等
         - 飞书使用 interactive 卡片 + markdown 标签，支持标准 Markdown 语法
     用法：
         $0  -h|--help
-        $0  [{-p|--platform dingding|weixin|feishu}]  [{-w|--webhook <Webhook地址>}]  {-t|--title <消息标题>}  {-m|--message <消息内容>}
+        $0  [-p|--platform dingding|weixin|feishu]  [-w|--webhook <Webhook地址>]  {-t|--title <消息标题>}  {-m|--message <消息内容>}
     参数规范：
-        无包围符号 ：-a                : 必选【选项】
-                   ：val               : 必选【参数值】
-                   ：val1 val2 -a -b   : 必选【选项或参数值】，且不分先后顺序
-        []         ：[-a]              : 可选【选项】
-                   ：[val]             : 可选【参数值】
-        <>         ：<val>             : 需替换的具体值（用户必须提供）
-        %%         ：%val%             : 通配符（包含匹配，如%error%匹配error_code）
-        |          ：val1|val2|<valn>  : 多选一
-        {}         ：{-a <val>}        : 必须成组出现【选项+参数值】，且保持顺序
-                   ：{val1 val2}       : 必须成组的【参数值组合】，且必须按顺序提供
+        |          : val1|val2|<valn>  : 多选一
+        <>         : <val>             : 需替换的具体值（用户必须提供）
+        %%         : %val%             : 双边通配符（包含匹配，如'%error%'匹配'os_error_code'）
+        %          : val%              : 单边通配符（包含匹配，如'error%'匹配'error_code'，'%error'匹配'os_error'）
+        []         : [-a]              : 可选
+                   : [-a val val2]     : 可选，必须成组出现，且保持顺序
+        {}         : {-a}              : 必选
+                   : {-a val val2}     : 必选，必须成组出现，且保持顺序
+        无{}[]包围 : -a                : 必选
+                   : -a val val2       : 必选，且不分先后顺序
+        [{}]       : [{-a val1} val2]  : 总体可选，使用此项时，必选'-a val1'，可选'val2'，必须成组出现，且保持顺序
+        {[]}       : {[-a val1] val2}  : 总体必选，使用此项时，可选'-a val1'，必选'val2'，必须成组出现，且保持顺序
+        arg1[,...argn] : val1,val2,var3=val3 : 有一个参数或多个参数，用','分隔
     参数说明：
         -h|--help                                此帮助
         -p|--platform dingding|weixin|feishu     指定平台：dingding(钉钉)、weixin(企业微信)、feishu(飞书)
@@ -64,11 +70,6 @@ F_HELP()
                                                  飞书：FEISHU_WEBHOOK_API
         -t|--title <消息标题>                    消息标题
         -m|--message <消息内容>                  消息内容（支持markdown格式）
-    环境变量：
-        DINGDING_WEBHOOK_API                     钉钉webhook地址
-        WEIXIN_WEBHOOK_API                       企业微信webhook地址
-        FEISHU_WEBHOOK_API                       飞书webhook地址
-        DEFAULT_NOTIFICATION_PLATFORM            默认平台(dingding/weixin/feishu)
     示例：
         # 使用钉钉发送
         $0  -p dingding  -t 'Test Title'  -m '### 测试消息'
