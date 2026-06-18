@@ -13,12 +13,12 @@ F_HELP()
         ${NEED_PRIVILEGES:-'未指定'}
     依赖：
         ./function.sh
-        ./my_conf/env.sh--<NAME>      #-- <依赖说明>
+        ./my_conf/env.sh         #-- <依赖说明>
     注意：
         <注意事项>
     用法：
         \$0  --help|-h                                        # 帮助
-        \$0  {--name|-n <参数>}  [--option|-o <参数>]  \\
+        \$0  {--optionA|-a <参数>}  [--optionB|-b <参数>]  \\
              [--flag]                                         #-- <简短用途说明>
     参数规范：
         |          : val1|val2|<valn>  : 多选一
@@ -36,11 +36,13 @@ F_HELP()
         arg1[,...argn] : val1,val2,var3=val3 : 有一个参数或多个参数，用','分隔
     参数说明：
         --help|-h                    # 帮助
-        --name|-n <参数>             # <选项参数说明>
-        --option|-o <参数>           # <选项参数说明>
+        --optionA|-a <参数>          # <选项参数说明>
+        --optionB|-b <参数>          # <选项参数说明>
         --flag                       # <选项说明>
+    环境变量：
+        VAR_NAME1                    # <变量说明>
     示例:
-        \$0  -n example      #-- <实现某个功能>
+        \$0  -a example      #-- <实现某个功能>
     "
 }
 ```
