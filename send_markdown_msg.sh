@@ -70,6 +70,11 @@ F_HELP()
                                                  飞书：FEISHU_WEBHOOK_API
         -t|--title <消息标题>                    消息标题
         -m|--message <消息内容>                  消息内容（支持markdown格式）
+    环境变量：
+        DINGDING_WEBHOOK_API                    钉钉webhook地址
+        WEIXIN_WEBHOOK_API                      企业微信webhook地址
+        FEISHU_WEBHOOK_API                      飞书webhook地址
+        DEFAULT_NOTIFICATION_PLATFORM           默认平台(dingding/weixin/feishu)
     示例：
         # 使用钉钉发送
         \$0  -p dingding  -t 'Test Title'  -m '### 测试消息'

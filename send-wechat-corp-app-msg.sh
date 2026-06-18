@@ -32,9 +32,7 @@ F_HELP()
         ${NEED_PRIVILEGES:-'未指定'}
     依赖：
         curl
-        env.sh--WECOM_CORP_ID       #-- 企业ID
-        env.sh--WECOM_AGENT_SECRET  #-- 应用Secret
-        env.sh--WECOM_AGENT_ID      #-- 应用AgentId
+        ./env.sh
     注意：
         - touser / toparty / totag 三者不能同时为空
         - 发送前确保已在企业微信管理后台配置好应用的可信IP
