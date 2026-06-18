@@ -31,8 +31,7 @@ F_HELP()
         ${NEED_PRIVILEGES:-'未指定'}
     依赖：
         curl
-        env.sh--WECHAT_APPID     #-- 公众号AppID
-        env.sh--WECHAT_SECRET    #-- 公众号AppSecret
+        ./env.sh
     注意：
         - 模板消息需要用户已授权订阅该模板
         - 客服消息需用户在48小时内与公众号有过交互
