@@ -61,8 +61,8 @@ F_HELP()
         --data|-d <key=val,key2=val2>        # 模板数据，逗号分隔的key=value（用于模板消息）
         --message|-m <内容>                  # 消息内容（用于客服消息）
     环境变量：
-        WECHAT_APPID                         公众号AppID（管理后台 → 开发 → 基本配置）
-        WECHAT_SECRET                        公众号AppSecret（管理后台 → 开发 → 基本配置）
+        WECHAT_APPID                         # 公众号AppID（管理后台 → 开发 → 基本配置）
+        WECHAT_SECRET                        # 公众号AppSecret（管理后台 → 开发 → 基本配置）
     示例：
         # 发送模板消息
         \$0  -u oXXXXX  -i '模板ID'  -d 'thing1=通知标题,thing2=内容摘要,time3=2026-01-01'
