@@ -44,8 +44,8 @@ F_HELP()
         - 企业微信使用 markdown_v2 类型，支持标题、加粗、斜体、链接、代码块、表格、列表、分割线、图片等
         - 飞书使用 interactive 卡片 + markdown 标签，支持标准 Markdown 语法
     用法：
-        $0  -h|--help
-        $0  [-p|--platform dingding|weixin|feishu]  [-w|--webhook <Webhook地址>]  {-t|--title <消息标题>}  {-m|--message <消息内容>}
+        \$0  -h|--help
+        \$0  [-p|--platform dingding|weixin|feishu]  [-w|--webhook <Webhook地址>]  {-t|--title <消息标题>}  {-m|--message <消息内容>}
     参数规范：
         |          : val1|val2|<valn>  : 多选一
         <>         : <val>             : 需替换的具体值（用户必须提供）
@@ -72,18 +72,18 @@ F_HELP()
         -m|--message <消息内容>                  消息内容（支持markdown格式）
     示例：
         # 使用钉钉发送
-        $0  -p dingding  -t 'Test Title'  -m '### 测试消息'
+        \$0  -p dingding  -t 'Test Title'  -m '### 测试消息'
         # 使用企业微信发送
-        $0  -p weixin  -t 'Test Title'  -m '### 测试消息'
+        \$0  -p weixin  -t 'Test Title'  -m '### 测试消息'
         # 使用飞书发送
-        $0  -p feishu  -t 'Test Title'  -m '### 测试消息'
+        \$0  -p feishu  -t 'Test Title'  -m '### 测试消息'
         # 自动检测平台（从webhook URL）
-        $0  -w 'https://oapi.dingtalk.com/robot/send?access_token=xxx'  -t 'Title'  -m 'Content'
+        \$0  -w 'https://oapi.dingtalk.com/robot/send?access_token=xxx'  -t 'Title'  -m 'Content'
         # 从文件读取内容
-        $0  -p dingding  -t 'Report'  -m \"\$(cat report.md)\"
+        \$0  -p dingding  -t 'Report'  -m \"\$(cat report.md)\"
         # 使用环境变量
         export DINGDING_WEBHOOK_API='https://oapi.dingtalk.com/robot/send?access_token=xxx'
-        $0  -p dingding  -t 'Title'  -m 'Content'
+        \$0  -p dingding  -t 'Title'  -m 'Content'
     "
 }
 
