@@ -61,9 +61,9 @@ F_HELP()
         --title|-t <标题>            # 消息标题
         --message|-m <内容>          # 消息内容（支持markdown格式）
     环境变量：
-        WECOM_CORP_ID               企业ID（管理后台 → 我的企业 → 企业信息）
-        WECOM_AGENT_SECRET          应用Secret（管理后台 → 应用管理 → 自建应用）
-        WECOM_AGENT_ID              应用AgentId（管理后台 → 应用管理 → 自建应用）
+        WECOM_CORP_ID               # 企业ID（管理后台 → 我的企业 → 企业信息）
+        WECOM_AGENT_SECRET          # 应用Secret（管理后台 → 应用管理 → 自建应用）
+        WECOM_AGENT_ID              # 应用AgentId（管理后台 → 应用管理 → 自建应用）
     示例：
         # 发送给单个用户
         \$0  -u zhangsan  -t '通知'  -m '### 测试消息\n> 这是一条引用'
