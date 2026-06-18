@@ -4,7 +4,7 @@
 #
 # 原作者信息如下：
 # https://blog.csdn.net/virnet/article/details/76273512
-#Filename:      format_table.sh
+#Filename:      format-table.sh
 #Revision:      0.2
 #Date:          2017/8/23
 #Author:        sunlinyao
@@ -14,10 +14,10 @@
 #               append_line参数是可选的，并且会自动对之前的append_cell换行
 #               使用output_table可输出表格
 #               暂不支持修改/插入/删除数据
-#               可使用. format_table.sh 或者source format_table.sh来引入改脚本的函数
+#               可使用. format-table.sh 或者source format-table.sh来引入改脚本的函数
 #               "(*)"会自动着色为红色字体
 #注：以Centos6.5标准写的，在其他系统上可能结果有差异，欢迎大家测试使用以及反馈八阿哥
-# [root@virnet ~]# bash format_table.sh
+# [root@virnet ~]# bash format-table.sh
 # +----+------+---------------+
 # |ID  |Name  |Creation time  |
 # +----+------+---------------+

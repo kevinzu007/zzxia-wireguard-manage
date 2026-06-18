@@ -35,7 +35,7 @@ EXIST_IP_FILE="${TEMP_DIR}/exist-ip.list"
 SEARCH_IP_FILE="${TEMP_DIR}/search-ip.list"
 EXIST_USER_FILE="${TEMP_DIR}/exist-user.list"
 # sh
-FORMAT_TABLE_SH="${SH_PATH}/format_table.sh"
+FORMAT_TABLE_SH="${SH_PATH}/format-table.sh"
 
 
 

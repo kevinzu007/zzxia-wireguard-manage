@@ -34,7 +34,7 @@ trap 'rm -f "${WG_DAILY_STATUS_FILE}"' EXIT
 YESTERDAY_WG_REPORT_FILE="${SH_PATH}/report/wg-daily-report-${WG_IF}---${YESTERDAY_DATE}.md"
 WG_REPORT_FILE="${SH_PATH}/report/wg-report-${WG_IF}.list"
 # sh
-FORMAT_TABLE_SH="${SH_PATH}/format_table.sh"
+FORMAT_TABLE_SH="${SH_PATH}/format-table.sh"
 
 
 # 采集

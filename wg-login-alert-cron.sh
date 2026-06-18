@@ -35,7 +35,7 @@ CURRENT_DATE=$(date -d "${TIME}" +%Y-%m-%d)
 WG_LOGIN_STATUS_FILE=$(mktemp /tmp/wg-login-status.XXXXXX)
 trap 'rm -f "${WG_LOGIN_STATUS_FILE}"' EXIT
 #
-NOTIFICATION_SH="${SH_PATH}/send_markdown_msg.sh"
+NOTIFICATION_SH="${SH_PATH}/send-markdown-msg.sh"
 
 
 # 必须软件jq
