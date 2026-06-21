@@ -105,8 +105,11 @@ F_SEND_TEMPLATE()
     local template_id="$3"
     local kv_data="$4"
 
+    # 将换行符统一替换为逗号，以完美支持多行格式的 data.txt
+    kv_data="${kv_data//$'\n'/,}"
+
     local send_header="Content-Type: application/json; charset=utf-8"
-    local url="https://api.weixin.qq.com/cgi-bin/message/subscribe/send?access_token=${token}"
+    local url="https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=${token}"
 
     # 解析 data 参数：thing1=xxx,thing2=yyy → JSON
     local data_json="{}"
@@ -114,6 +117,11 @@ F_SEND_TEMPLATE()
         local obj="{}"
         IFS=',' read -ra pairs <<< "${kv_data}"
         for pair in "${pairs[@]}"; do
+            # 兼容空行、多余的逗号，以及没有等号的非法格式
+            pair=$(echo "${pair}" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+            [ -z "${pair}" ] && continue
+            [[ "${pair}" != *"="* ]] && continue
+            
             key="${pair%%=*}"
             val="${pair#*=}"
             # 去除首尾空格
@@ -127,6 +135,11 @@ F_SEND_TEMPLATE()
         local items=""
         IFS=',' read -ra pairs <<< "${kv_data}"
         for pair in "${pairs[@]}"; do
+            # 兼容空行、多余的逗号，以及没有等号的非法格式
+            pair=$(echo "${pair}" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+            [ -z "${pair}" ] && continue
+            [[ "${pair}" != *"="* ]] && continue
+            
             key="${pair%%=*}"
             val="${pair#*=}"
             key=$(echo "${key}" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
