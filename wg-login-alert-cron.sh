@@ -120,75 +120,100 @@ F_SEARCH_USER_NAME()
 
 
 
+# 写入今日登录状态记录
+F_RECORD_USER_STATE()
+{
+    local status="$1"
+    local area="$2"
+    echo "| ${CURRENT_DATE} | ${USER_NAME} | ${USER_ENDPOINT_IP} | ${USER_LATEST_HAND_SECOND_TIME} | ${area} | ${status} |" >> "${TODAY_WG_USER_LATEST_LOGIN_FILE}"
+}
+
+# 场景 1：今日首次登录
+F_HANDLE_FIRST_LOGIN()
+{
+    USER_ENDPOINT_AREA=$(F_IP_AREA "${USER_ENDPOINT_IP}")
+    F_RECORD_USER_STATE "已登录" "${USER_ENDPOINT_AREA}"
+    F_LOGIN_SEND_MSG
+    F_LOG "INFO" "用户登录：${USER_NAME}，IP：${USER_ENDPOINT_IP}，位置：${USER_ENDPOINT_AREA}"
+}
+
+# 场景 2：远程 IP 变更
+F_HANDLE_IP_CHANGE()
+{
+    local line_num="$1"
+    sed -i "${line_num}d" "${TODAY_WG_USER_LATEST_LOGIN_FILE}"
+    USER_ENDPOINT_AREA=$(F_IP_AREA "${USER_ENDPOINT_IP}")
+    F_RECORD_USER_STATE "已登录" "${USER_ENDPOINT_AREA}"
+    F_NEW_IP_SEND_MSG
+    F_LOG "INFO" "用户IP变更：${USER_NAME}，新IP：${USER_ENDPOINT_IP}，位置：${USER_ENDPOINT_AREA}"
+}
+
+# 场景 3：心跳状态（在线/离线）检查
+F_HANDLE_HEARTBEAT()
+{
+    local line_num="$1"
+    local area="$2"
+    local last_status="$3"
+
+    local current_second
+    current_second=$(date +%s)
+    local time_interval=$(( current_second - USER_LATEST_HAND_SECOND ))
+
+    if [ "${time_interval}" -gt 300 ]; then
+        # 超过300秒无握手：若此前为“已登录”则标记“已离线”
+        if [[ "${last_status}" = "已登录" ]]; then
+            sed -i "${line_num}d" "${TODAY_WG_USER_LATEST_LOGIN_FILE}"
+            F_RECORD_USER_STATE "已离线" "${area}"
+            F_OFFLINE_SEND_MSG
+            F_LOG "INFO" "用户离线：${USER_NAME}"
+        fi
+    else
+        # 300秒内有握手：若此前为“已离线”则标记重新“已登录”
+        if [[ "${last_status}" = "已离线" ]]; then
+            sed -i "${line_num}d" "${TODAY_WG_USER_LATEST_LOGIN_FILE}"
+            F_RECORD_USER_STATE "已登录" "${area}"
+            F_LOGIN_SEND_MSG
+            F_LOG "INFO" "用户重新上线：${USER_NAME}，IP：${USER_ENDPOINT_IP}"
+        fi
+    fi
+}
+
+
+
 # 采集
 wg show "${WG_IF}" dump > "${WG_LOGIN_STATUS_FILE}"
 sed -i '1d' "${WG_LOGIN_STATUS_FILE}"
 #
 touch "${TODAY_WG_USER_LATEST_LOGIN_FILE}"
-while read LINE
+while read -r LINE
 do
     F_PARSE_WG_DUMP_LINE "${LINE}"
     F_LOOKUP_USER "${USER_PEER}" "${SERVER_CONF_FILE}"
-    #
-    # 是否有握手信息
-    if [ "${USER_LATEST_HAND_SECOND}" -ne 0 ]; then
-        # 有握手信息
-        USER_LATEST_HAND_SECOND_TIME=$(date -d "@${USER_LATEST_HAND_SECOND}" +%H:%M:%S)
-        #
-        LINE_NUM=$(F_SEARCH_USER_NAME "${USER_NAME}" || true)
-        if [[ ${LINE_NUM} =~ ^[0-9]+$ ]]; then
-            # 找到，代表用户登录过
-            USER_ENDPOINT_IP_LAST=$(sed -n "${LINE_NUM}p" "${TODAY_WG_USER_LATEST_LOGIN_FILE}" | awk -F '|' '{print $4}')
-            USER_ENDPOINT_IP_LAST=$(echo ${USER_ENDPOINT_IP_LAST})
-            USER_ENDPOINT_AREA=$(sed -n "${LINE_NUM}p" "${TODAY_WG_USER_LATEST_LOGIN_FILE}" | awk -F '|' '{print $6}')
-            USER_ENDPOINT_AREA=$(echo ${USER_ENDPOINT_AREA})
-            #
-            if [ "${USER_ENDPOINT_IP}" != "${USER_ENDPOINT_IP_LAST}" ]; then
-                # 和上次登录IP不一样
-                # 删除旧的
-                sed -i "${LINE_NUM}d" "${TODAY_WG_USER_LATEST_LOGIN_FILE}"
-                USER_LOGIN_STATUS='已登录'
-                # 重新获取地理位置
-                USER_ENDPOINT_AREA=$(F_IP_AREA "${USER_ENDPOINT_IP}")
-                echo "| ${CURRENT_DATE} | ${USER_NAME} | ${USER_ENDPOINT_IP} | ${USER_LATEST_HAND_SECOND_TIME} | ${USER_ENDPOINT_AREA} | ${USER_LOGIN_STATUS} |" >> "${TODAY_WG_USER_LATEST_LOGIN_FILE}"
-                F_NEW_IP_SEND_MSG > /dev/null 2>&1 || true
-                F_LOG "INFO" "用户IP变更：${USER_NAME}，新IP：${USER_ENDPOINT_IP}，位置：${USER_ENDPOINT_AREA}"
-                continue
-            fi
-            #
-            CURRENT_SECOND=$(date +%s)
-            (( TIME_INTERVAL = CURRENT_SECOND - USER_LATEST_HAND_SECOND ))
-            USER_LOGIN_STATUS_LAST=$(sed -n "${LINE_NUM}p" "${TODAY_WG_USER_LATEST_LOGIN_FILE}" | awk -F '|' '{print $7}')
-            USER_LOGIN_STATUS_LAST=$(echo ${USER_LOGIN_STATUS_LAST})
-            if [ ${TIME_INTERVAL} -gt 300 ]; then
-                # 最后登录时间超过300秒
-                if [[ "${USER_LOGIN_STATUS_LAST}" = "已登录" ]]; then
-                    sed -i "${LINE_NUM}d" "${TODAY_WG_USER_LATEST_LOGIN_FILE}"
-                    USER_LOGIN_STATUS='已离线'
-                    echo "| ${CURRENT_DATE} | ${USER_NAME} | ${USER_ENDPOINT_IP} | ${USER_LATEST_HAND_SECOND_TIME} | ${USER_ENDPOINT_AREA} | ${USER_LOGIN_STATUS} |" >> "${TODAY_WG_USER_LATEST_LOGIN_FILE}"
-                    F_OFFLINE_SEND_MSG > /dev/null 2>&1 || true
-                    F_LOG "INFO" "用户离线：${USER_NAME}"
-                fi
-            else
-                # 最后登录时间小于300秒
-                if [[ "${USER_LOGIN_STATUS_LAST}" = "已离线" ]]; then
-                    sed -i "${LINE_NUM}d" "${TODAY_WG_USER_LATEST_LOGIN_FILE}"
-                    USER_LOGIN_STATUS='已登录'
-                    echo "| ${CURRENT_DATE} | ${USER_NAME} | ${USER_ENDPOINT_IP} | ${USER_LATEST_HAND_SECOND_TIME} | ${USER_ENDPOINT_AREA} | ${USER_LOGIN_STATUS} |" >> "${TODAY_WG_USER_LATEST_LOGIN_FILE}"
-                    F_LOGIN_SEND_MSG > /dev/null 2>&1 || true
-                    F_LOG "INFO" "用户重新上线：${USER_NAME}，IP：${USER_ENDPOINT_IP}"
-                fi
-            fi
+
+    # 忽略无握手记录的 Peer
+    [ "${USER_LATEST_HAND_SECOND}" -eq 0 ] && continue
+
+    USER_LATEST_HAND_SECOND_TIME=$(date -d "@${USER_LATEST_HAND_SECOND}" +%H:%M:%S)
+    LINE_NUM=$(F_SEARCH_USER_NAME "${USER_NAME}" || true)
+
+    if [[ ! ${LINE_NUM} =~ ^[0-9]+$ ]]; then
+        # 场景 1：今日首次登录
+        F_HANDLE_FIRST_LOGIN
+    else
+        # 提取已有记录信息
+        USER_ENDPOINT_IP_LAST=$(sed -n "${LINE_NUM}p" "${TODAY_WG_USER_LATEST_LOGIN_FILE}" | awk -F '|' '{print $4}' | awk '{gsub(/^\s+|\s+$/, ""); print}')
+        USER_ENDPOINT_AREA_LAST=$(sed -n "${LINE_NUM}p" "${TODAY_WG_USER_LATEST_LOGIN_FILE}" | awk -F '|' '{print $6}' | awk '{gsub(/^\s+|\s+$/, ""); print}')
+        USER_LOGIN_STATUS_LAST=$(sed -n "${LINE_NUM}p" "${TODAY_WG_USER_LATEST_LOGIN_FILE}" | awk -F '|' '{print $7}' | awk '{gsub(/^\s+|\s+$/, ""); print}')
+
+        if [ "${USER_ENDPOINT_IP}" != "${USER_ENDPOINT_IP_LAST}" ]; then
+            # 场景 2：远程 IP 变更
+            F_HANDLE_IP_CHANGE "${LINE_NUM}"
         else
-            # 未找到，代表用户未登录过
-            USER_LOGIN_STATUS='已登录'
-            # 获取地理位置
-            USER_ENDPOINT_AREA=$(F_IP_AREA "${USER_ENDPOINT_IP}")
-            echo "| ${CURRENT_DATE} | ${USER_NAME} | ${USER_ENDPOINT_IP} | ${USER_LATEST_HAND_SECOND_TIME} | ${USER_ENDPOINT_AREA} | ${USER_LOGIN_STATUS} |" >> "${TODAY_WG_USER_LATEST_LOGIN_FILE}"
-            F_LOGIN_SEND_MSG > /dev/null 2>&1 || true
-            F_LOG "INFO" "用户登录：${USER_NAME}，IP：${USER_ENDPOINT_IP}，位置：${USER_ENDPOINT_AREA}"
+            # 场景 3：在线 / 离线心跳检测
+            F_HANDLE_HEARTBEAT "${LINE_NUM}" "${USER_ENDPOINT_AREA_LAST}" "${USER_LOGIN_STATUS_LAST}"
         fi
     fi
 done < "${WG_LOGIN_STATUS_FILE}"
+
 
 
