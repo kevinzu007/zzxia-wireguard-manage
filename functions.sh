@@ -109,3 +109,51 @@ F_SED_ESCAPE()
     printf '%s' "$1" | sed -e 's/[]\/$*.^&[]/\\&/g'
 }
 
+
+# --- IP 地理位置查询 ---
+
+# 获取 IP 地理位置（支持 IPv4 / IPv6）
+# 用法：F_IP_AREA "IP地址"
+F_IP_AREA()
+{
+    local ip="$1"
+    local area=""
+    local resp=""
+
+    if [ -z "${ip}" ] || [ "${ip}" = "(none)" ]; then
+        echo "未知"
+        return 0
+    fi
+
+    # 优先使用 ip-api.com
+    resp=$(curl -s --connect-timeout 5 --max-time 10 "http://ip-api.com/json/${ip}?lang=zh-CN" 2>/dev/null || true)
+    if [ -n "${resp}" ] && echo "${resp}" | jq -e '.status == "success"' >/dev/null 2>&1; then
+        area=$(echo "${resp}" | jq -r '
+            [.country, .regionName, .city, .isp] 
+            | map(select(. != null and . != "")) 
+            | join(" ")
+        ' 2>/dev/null || true)
+    fi
+
+    # 备用方案：ipwho.is
+    if [ -z "${area}" ]; then
+        resp=$(curl -s --connect-timeout 5 --max-time 10 "https://ipwho.is/${ip}?lang=zh-CN" 2>/dev/null || true)
+        if [ -n "${resp}" ] && echo "${resp}" | jq -e '.success == true' >/dev/null 2>&1; then
+            area=$(echo "${resp}" | jq -r '
+                [.country, .region, .city, .connection.isp] 
+                | map(select(. != null and . != "")) 
+                | join(" ")
+            ' 2>/dev/null || true)
+        fi
+    fi
+
+    if [ -z "${area}" ] || [ "${area}" = "null" ]; then
+        area="获取失败：${ip}"
+    fi
+
+    # 过滤可能影响 Markdown 表格或引号的字符
+    area=$(echo "${area}" | sed -e 's/\"//g' -e 's/|//g')
+    echo "${area}"
+    return 0
+}
+

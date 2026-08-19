@@ -78,19 +78,6 @@ F_OFFLINE_SEND_MSG()
 }
 
 
-# 获取IP位置，用法： F_IP_AREA {IP}
-F_IP_AREA()
-{
-    local F_IP="$1"
-    local F_AREA
-    F_AREA=$( (curl -s --connect-timeout 5 --max-time 10 "http://www.cip.cc/${F_IP}" 2>/dev/null || true) | (grep '数据二' || true) | awk -F ":" '{print $2}' | awk '{gsub(/^\s+|\s+$/, ""); print}' | awk '{gsub(/\s+/, ""); print}')
-    if [ -z "${F_AREA}" ] || [ "${F_AREA}" = "null" ]; then
-        F_AREA="获取失败：${F_IP}"
-    fi
-    F_AREA=$(echo "${F_AREA}" | sed -e 's/\"//g' -e 's/|//g')
-    echo "${F_AREA}"
-    return 0
-}
 
 
 

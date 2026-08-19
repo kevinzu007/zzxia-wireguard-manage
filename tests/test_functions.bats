@@ -138,3 +138,22 @@ EOF
     [ "${result}" = 'a\.b' ]
 }
 
+@test "F_IP_AREA 处理空值和 (none)" {
+    local result
+    result=$(F_IP_AREA "")
+    [ "${result}" = "未知" ]
+    result=$(F_IP_AREA "(none)")
+    [ "${result}" = "未知" ]
+}
+
+@test "F_IP_AREA 查询有效 IPv4 和 IPv6" {
+    local result
+    result=$(F_IP_AREA "114.114.114.114")
+    [ -n "${result}" ]
+    [[ ! "${result}" =~ "获取失败" ]]
+
+    result=$(F_IP_AREA "2408:8256:c8:1bdd:ab10:372f:19de:115d")
+    [ -n "${result}" ]
+    [[ ! "${result}" =~ "获取失败" ]]
+}
+
