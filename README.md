@@ -62,6 +62,7 @@ TODAY_WG_USER_LATEST_LOGIN_FILE="/tmp/wg-user-first-login-today.txt"
 export DINGDING_API_URL_FOR_LOGIN="https://oapi.dingtalk.com/robot/send?access_token=填上你的token在这里"      #-- 用来发送钉钉消息
 # server env
 SERVER_CONNECT_INFO='服务器IP或域名:端口如51820'            #--- wireguard服务器用以接受用户连接的IP或域名及端口，用来生成用户的wg配置文件
+SERVER_CONNECT_INFO_V6=''                                   #--- 可选：wireguard服务器用以接受用户连接的IPv6地址及端口（如 [2408:...]:51820），用来生成IPv6客户端配置文件
 # user env
 USER_DNSs='192.168.11.3,192.168.11.4'                       #--- 用户的DNS，用来设置用户的DNS
 USER_ALOWED_IPs="${IP_PREFIX}.0/${IP_NETMASK},0.0.0.0/0"    #--- 用户端走Wireguard链路的网络地址范围（用来设置用户端路由）
@@ -81,34 +82,32 @@ USER_ALOWED_IPs="${IP_PREFIX}.0/${IP_NETMASK},0.0.0.0/0"    #--- 用户端走Wir
 ```bash
 # ./wg-manage.sh -h
 
-    用途：用于wireguard的用户管理
-    依赖：./env.sh
-          qrencode
+    用途：WireGuard 用户管理（添加、删除、查看用户及服务器状态）
+    依赖：
+        ./env.sh
+        ./functions.sh
+        qrencode            #-- 二维码生成（可选）
     注意：
+        修改用户后需 reload 才能生效
     用法：
-        ./wg-manage.sh  [-h|--help]
-        ./wg-manage.sh  [-l|--list]
-        ./wg-manage.sh  [-a|--add {用户名}]  <{IP第4段}>
-        ./wg-manage.sh  [-r|--rm|-o|--output-config  {用户名}]
-        ./wg-manage.sh  [-R|--reload]
-        ./wg-manage.sh  [-s|--status]
+        $0  --help|-h                                        #-- 帮助
+        $0  --list|-l                                        #-- 列出用户清单
+        $0  {--add|-a <用户名>}  [<IP第4段>]                 #-- 添加用户（自动生成 IPv4 及 IPv6 配置）
+        $0  {--rm|-r <用户名>}                               #-- 删除用户
+        $0  {--output-config|-o <用户名>}  [--ipv4|-4|--ipv6|-6] #-- 输出用户配置
+        $0  --reload|-R                                      #-- 重启服务器
+        $0  --status|-s                                      #-- 查看状态
     参数说明：
-        \$0   : 代表脚本本身
-        []   : 代表是必选项
-        <>   : 代表是可选项
-        |    : 代表左右选其一
-        {}   : 代表参数值，请替换为具体参数值
-        %    : 代表通配符，非精确值，可以被包含
-        #
-        -h|--help      此帮助
-        -l|--list      列出现有用户
-        -a|--add       添加用户
-        -r|--rm        删除用户
-        -o|--output-config 输出用户配置文件
-        -R|--reload    重启服务器
-        -s|--status    服务器状态
+        --help|-h                    # 帮助
+        --list|-l                    # 列出用户清单
+        --add|-a <用户名>            # 添加用户（可选指定IP尾号）
+        --rm|-r <用户名>             # 删除用户
+        --output-config|-o <用户名>  # 输出用户配置文件
+        --ipv4|-4                    # 配合 -o 使用，仅输出 IPv4 配置
+        --ipv6|-6                    # 配合 -o 使用，仅输出 IPv6 配置
+        --reload|-R                  # 重启服务器
+        --status|-s                  # 查看服务器状态
     示例:
-        #
         ./wg-manage.sh  -l              #--- 列出用户清单
         #
         ./wg-manage.sh  -a 猪猪侠 11    #--- 添加用户【猪猪侠】，IP地址尾号为【11】
@@ -116,7 +115,9 @@ USER_ALOWED_IPs="${IP_PREFIX}.0/${IP_NETMASK},0.0.0.0/0"    #--- 用户端走Wir
         #
         ./wg-manage.sh  -r 猪猪侠       #--- 删除用户【猪猪侠】
         #
-        ./wg-manage.sh  -o 猪猪侠       #--- 输出用户【猪猪侠】的配置文件
+        ./wg-manage.sh  -o 猪猪侠       #--- 输出用户【猪猪侠】的 IPv4 及 IPv6 配置文件
+        ./wg-manage.sh  -o 猪猪侠 -4    #--- 仅输出用户【猪猪侠】的 IPv4 配置文件
+        ./wg-manage.sh  -o 猪猪侠 -6    #--- 仅输出用户【猪猪侠】的 IPv6 配置文件
         #
         ./wg-manage.sh  -R              #--- 重启服务器
         #
