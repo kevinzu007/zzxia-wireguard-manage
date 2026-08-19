@@ -218,8 +218,7 @@ function output_table(){
 
 
 # 参数检查
-TEMP=$(getopt -o hd:t:r:f: -l help,delimeter:,title:,row:,file: -- "$@")
-if [ $? != 0 ]; then
+if ! TEMP=$(getopt -o hd:t:r:f: -l help,delimeter:,title:,row:,file: -- "$@"); then
     echo -e "\n猪猪侠警告：参数不合法，请查看帮助【$0 --help】\n"
     exit 1
 fi

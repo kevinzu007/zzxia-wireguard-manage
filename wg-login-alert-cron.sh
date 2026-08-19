@@ -12,6 +12,8 @@
 sleep 30
 
 
+set -eo pipefail
+
 # sh
 SH_NAME=${0##*/}
 SH_PATH=$( cd "$( dirname "$0" )" && pwd )
@@ -41,9 +43,11 @@ NOTIFICATION_SH="${SH_PATH}/send-markdown-msg.sh"
 # 必须软件jq
 if ! command -v jq > /dev/null 2>&1; then
     echo -e "猪猪侠警告：${SH_NAME} - 请安装软件jq"
-    "${NOTIFICATION_SH}" \
-        --title "【Info:wg用户登录:$(hostname -s)】" \
-        --message "$( echo -e "### 请安装软件jq" )"
+    if [ -f "${NOTIFICATION_SH}" ]; then
+        "${NOTIFICATION_SH}" \
+            --title "【Info:wg用户登录:$(hostname -s)】" \
+            --message "$( echo -e "### 请安装软件jq" )" 2>/dev/null || true
+    fi
     exit 1
 fi
 
@@ -54,7 +58,7 @@ F_LOGIN_SEND_MSG()
 {
     "${NOTIFICATION_SH}" \
         --title "【Info:wg登录:$(hostname -s)】" \
-        --message "$( echo -e "### 用户：${USER_NAME} \n### 最近握手时间：${USER_LATEST_HAND_SECOND_TIME} \n### WG_IP：${USER_IP} \n### 远程IP：${USER_ENDPOINT_IP} \n### 地理位置：${USER_ENDPOINT_AREA} \n\n" )"
+        --message "$( echo -e "### 用户：${USER_NAME} \n### 最近握手时间：${USER_LATEST_HAND_SECOND_TIME} \n### WG_IP：${USER_IP} \n### 远程IP：${USER_ENDPOINT_IP} \n### 地理位置：${USER_ENDPOINT_AREA} \n\n" )" 2>/dev/null || true
 }
 
 # 新IP消息
@@ -62,7 +66,7 @@ F_NEW_IP_SEND_MSG()
 {
     "${NOTIFICATION_SH}" \
         --title "【Info:wg登录:$(hostname -s)】" \
-        --message "$( echo -e "### 用户：${USER_NAME} \n### 新远程IP：${USER_ENDPOINT_IP} \n### 地理位置：${USER_ENDPOINT_AREA} \n\n" )"
+        --message "$( echo -e "### 用户：${USER_NAME} \n### 新远程IP：${USER_ENDPOINT_IP} \n### 地理位置：${USER_ENDPOINT_AREA} \n\n" )" 2>/dev/null || true
 }
 
 # 离线消息
@@ -70,15 +74,8 @@ F_OFFLINE_SEND_MSG()
 {
     "${NOTIFICATION_SH}" \
         --title "【Info:wg用户离线:$(hostname -s)】" \
-        --message "$( echo -e "### 用户：${USER_NAME} \n### 最近握手时间：${USER_LATEST_HAND_SECOND_TIME} \n\n" )"
+        --message "$( echo -e "### 用户：${USER_NAME} \n### 最近握手时间：${USER_LATEST_HAND_SECOND_TIME} \n\n" )" 2>/dev/null || true
 }
-
-
-## 邮件
-#F_SEND_MAIL()
-#{
-#    echo -e "### 用户：${USER_NAME} \n### 最近握手时间：${USER_LATEST_HAND_SECOND_TIME} \n### WG_IP：${USER_IP} \n### 远程IP：${USER_ENDPOINT_IP} \n\n" | mailx  -s "【wg登录:$(hostname -s)}】用户：${USER_NAME}"  ${EMAIL}  >/dev/null 2>&1
-#}
 
 
 # 获取IP位置，用法： F_IP_AREA {IP}
@@ -86,8 +83,7 @@ F_IP_AREA()
 {
     local F_IP="$1"
     local F_AREA
-    F_AREA=$(curl -s --connect-timeout 5 --max-time 10 "http://www.cip.cc/${F_IP}" | grep '数据二' | awk -F ":" '{print $2}' | awk '{gsub(/^\s+|\s+$/, ""); print}' | awk '{gsub(/\s+/, ""); print}')
-    #F_AREA=$(curl -s --connect-timeout 5 --max-time 10 "https://api.ip.sb/geoip/${F_IP}" | jq '.country,.region,.city' 2>/dev/null | sed -n 's/\"/ /gp' | awk 'NR == 1{printf "%s->",$0} NR == 2{printf "%s->",$0} NR == 3{printf "%s\n",$0}')
+    F_AREA=$( (curl -s --connect-timeout 5 --max-time 10 "http://www.cip.cc/${F_IP}" 2>/dev/null || true) | (grep '数据二' || true) | awk -F ":" '{print $2}' | awk '{gsub(/^\s+|\s+$/, ""); print}' | awk '{gsub(/\s+/, ""); print}')
     if [ -z "${F_AREA}" ] || [ "${F_AREA}" = "null" ]; then
         F_AREA="获取失败：${F_IP}"
     fi
@@ -139,7 +135,7 @@ do
         # 有握手信息
         USER_LATEST_HAND_SECOND_TIME=$(date -d "@${USER_LATEST_HAND_SECOND}" +%H:%M:%S)
         #
-        LINE_NUM=$(F_SEARCH_USER_NAME "${USER_NAME}")
+        LINE_NUM=$(F_SEARCH_USER_NAME "${USER_NAME}" || true)
         if [[ ${LINE_NUM} =~ ^[0-9]+$ ]]; then
             # 找到，代表用户登录过
             USER_ENDPOINT_IP_LAST=$(sed -n "${LINE_NUM}p" "${TODAY_WG_USER_LATEST_LOGIN_FILE}" | awk -F '|' '{print $4}')
@@ -155,7 +151,7 @@ do
                 # 重新获取地理位置
                 USER_ENDPOINT_AREA=$(F_IP_AREA "${USER_ENDPOINT_IP}")
                 echo "| ${CURRENT_DATE} | ${USER_NAME} | ${USER_ENDPOINT_IP} | ${USER_LATEST_HAND_SECOND_TIME} | ${USER_ENDPOINT_AREA} | ${USER_LOGIN_STATUS} |" >> "${TODAY_WG_USER_LATEST_LOGIN_FILE}"
-                F_NEW_IP_SEND_MSG > /dev/null
+                F_NEW_IP_SEND_MSG > /dev/null 2>&1 || true
                 F_LOG "INFO" "用户IP变更：${USER_NAME}，新IP：${USER_ENDPOINT_IP}，位置：${USER_ENDPOINT_AREA}"
                 continue
             fi
@@ -170,7 +166,7 @@ do
                     sed -i "${LINE_NUM}d" "${TODAY_WG_USER_LATEST_LOGIN_FILE}"
                     USER_LOGIN_STATUS='已离线'
                     echo "| ${CURRENT_DATE} | ${USER_NAME} | ${USER_ENDPOINT_IP} | ${USER_LATEST_HAND_SECOND_TIME} | ${USER_ENDPOINT_AREA} | ${USER_LOGIN_STATUS} |" >> "${TODAY_WG_USER_LATEST_LOGIN_FILE}"
-                    F_OFFLINE_SEND_MSG > /dev/null
+                    F_OFFLINE_SEND_MSG > /dev/null 2>&1 || true
                     F_LOG "INFO" "用户离线：${USER_NAME}"
                 fi
             else
@@ -179,7 +175,7 @@ do
                     sed -i "${LINE_NUM}d" "${TODAY_WG_USER_LATEST_LOGIN_FILE}"
                     USER_LOGIN_STATUS='已登录'
                     echo "| ${CURRENT_DATE} | ${USER_NAME} | ${USER_ENDPOINT_IP} | ${USER_LATEST_HAND_SECOND_TIME} | ${USER_ENDPOINT_AREA} | ${USER_LOGIN_STATUS} |" >> "${TODAY_WG_USER_LATEST_LOGIN_FILE}"
-                    F_LOGIN_SEND_MSG > /dev/null
+                    F_LOGIN_SEND_MSG > /dev/null 2>&1 || true
                     F_LOG "INFO" "用户重新上线：${USER_NAME}，IP：${USER_ENDPOINT_IP}"
                 fi
             fi
@@ -189,7 +185,7 @@ do
             # 获取地理位置
             USER_ENDPOINT_AREA=$(F_IP_AREA "${USER_ENDPOINT_IP}")
             echo "| ${CURRENT_DATE} | ${USER_NAME} | ${USER_ENDPOINT_IP} | ${USER_LATEST_HAND_SECOND_TIME} | ${USER_ENDPOINT_AREA} | ${USER_LOGIN_STATUS} |" >> "${TODAY_WG_USER_LATEST_LOGIN_FILE}"
-            F_LOGIN_SEND_MSG > /dev/null
+            F_LOGIN_SEND_MSG > /dev/null 2>&1 || true
             F_LOG "INFO" "用户登录：${USER_NAME}，IP：${USER_ENDPOINT_IP}，位置：${USER_ENDPOINT_AREA}"
         fi
     fi

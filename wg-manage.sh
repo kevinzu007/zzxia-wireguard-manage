@@ -6,6 +6,8 @@
 #############################################################################
 
 
+set -eo pipefail
+
 # sh
 SH_NAME=${0##*/}
 SH_PATH=$( cd "$( dirname "$0" )" && pwd )
@@ -136,8 +138,7 @@ AllowedIPs = ${USER_ALOWED_IPs}
 
 
 
-TEMP=$(getopt -o hla:r:o:Rs  -l help,list,add:,rm:,output-config:,reload,status -- "$@")
-if [ $? != 0 ]; then
+if ! TEMP=$(getopt -o hla:r:o:Rs  -l help,list,add:,rm:,output-config:,reload,status -- "$@"); then
     echo -e "\n猪猪侠警告：参数不合法，请查看帮助【$0 --help】\n"
     exit 1
 fi
@@ -168,12 +169,11 @@ do
             # 是否提供ip尾号
             if [ -z "${IP_SUFFIX}" ]; then
                 # 未提供
-                grep '##' "${SERVER_CONF_FILE}" | cut -d ' ' -f 3 | cut -d '.' -f 4 | sort > "${EXIST_IP_FILE}"
+                (grep '##' "${SERVER_CONF_FILE}" 2>/dev/null || true) | cut -d ' ' -f 3 | cut -d '.' -f 4 | sort > "${EXIST_IP_FILE}"
                 sed -i 's/^/S/; s/$/E/' "${EXIST_IP_FILE}"
                 # 普通用户IP从IP_START开始分配
                 for i in $(seq "${IP_START}" 254); do
-                    grep -q "S${i}E" "${EXIST_IP_FILE}"
-                    if [ $? -ne 0 ]; then
+                    if ! grep -q "S${i}E" "${EXIST_IP_FILE}"; then
                         IP_SUFFIX=$i
                         break
                     fi
@@ -184,20 +184,18 @@ do
                 fi
             else
                 # 已提供
-                grep '##' "${SERVER_CONF_FILE}" | grep "${IP_SUFFIX}" | cut -d ' ' -f 3 | cut -d '.' -f 4 > "${SEARCH_IP_FILE}"
+                (grep '##' "${SERVER_CONF_FILE}" 2>/dev/null || true) | (grep "${IP_SUFFIX}" || true) | cut -d ' ' -f 3 | cut -d '.' -f 4 > "${SEARCH_IP_FILE}"
                 sed -i 's/^/S/; s/$/E/' "${SEARCH_IP_FILE}"
-                grep -q "S${IP_SUFFIX}E" "${SEARCH_IP_FILE}"
-                if [ $? -eq 0 ]; then
+                if grep -q "S${IP_SUFFIX}E" "${SEARCH_IP_FILE}"; then
                     echo -e "\n猪猪侠警告：IP尾号【${IP_SUFFIX}】已经存在，请换一个！\n"
                     exit 1
                 fi
             fi
             USER_IP=${IP_PREFIX}.${IP_SUFFIX}
             # 用户是否已存在
-            grep "##" "${SERVER_CONF_FILE}" | grep "${USER_NAME}" | cut -d ' ' -f 2 > "${EXIST_USER_FILE}"
+            (grep "##" "${SERVER_CONF_FILE}" 2>/dev/null || true) | (grep "${USER_NAME}" || true) | cut -d ' ' -f 2 > "${EXIST_USER_FILE}"
             sed -i 's/^/S/; s/$/E/' "${EXIST_USER_FILE}"
-            grep -q "S${USER_NAME}E" "${EXIST_USER_FILE}"
-            if [ $? -eq 0 ]; then
+            if grep -q "S${USER_NAME}E" "${EXIST_USER_FILE}"; then
                 echo -e "\n猪猪侠警告：用户【${USER_NAME}】已存在\n"
                 exit 1
             fi

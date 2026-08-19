@@ -9,6 +9,7 @@
 # https://www.wireguard.com/install/
 
 
+set -euo pipefail
 umask 0077
 
 # sh
@@ -25,13 +26,13 @@ F_CHECK_ROOT
 
 if [ -e "${SERVER_CONF_FILE}" ]; then
     echo -e "\n猪猪侠警告：服务器配置文件已存在，请勿重复设置，退出\n"
-    exit
+    exit 0
 fi
 
 
 # mod
 modprobe wireguard
-if [ "$(lsmod | grep -q wireguard ; echo $?)" != '0' ]; then
+if ! lsmod | grep -q wireguard; then
     echo -e "\n猪猪侠警告：内核模块【wireguard】未加载，请检查！\n"
     exit 1
 fi

@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 
 # sh
 SH_NAME=${0##*/}
@@ -14,7 +15,7 @@ F_CHECK_ROOT
 
 echo "现有计划任务如下："
 echo "------------------------------"
-crontab -l 2>/dev/null
+crontab -l 2>/dev/null || true
 echo "------------------------------"
 echo
 

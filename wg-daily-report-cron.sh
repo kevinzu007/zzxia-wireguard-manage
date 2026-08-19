@@ -8,6 +8,7 @@
 # 每天00:00运行
 # 0 0 * * *  /root/zzxia-wireguard-manage/wg-daily-report-cron.sh
 
+set -eo pipefail
 
 # sh
 SH_NAME=${0##*/}
