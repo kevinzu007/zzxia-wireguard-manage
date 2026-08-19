@@ -158,9 +158,14 @@ F_HANDLE_HEARTBEAT()
         # 300秒内有握手：若此前为“已离线”则标记重新“已登录”
         if [[ "${last_status}" = "已离线" ]]; then
             sed -i "${line_num}d" "${TODAY_WG_USER_LATEST_LOGIN_FILE}"
-            F_RECORD_USER_STATE "已登录" "${area}"
+            if [ -z "${area}" ] || [[ "${area}" =~ "获取失败" ]]; then
+                USER_ENDPOINT_AREA=$(F_IP_AREA "${USER_ENDPOINT_IP}")
+            else
+                USER_ENDPOINT_AREA="${area}"
+            fi
+            F_RECORD_USER_STATE "已登录" "${USER_ENDPOINT_AREA}"
             F_LOGIN_SEND_MSG
-            F_LOG "INFO" "用户重新上线：${USER_NAME}，IP：${USER_ENDPOINT_IP}"
+            F_LOG "INFO" "用户重新上线：${USER_NAME}，IP：${USER_ENDPOINT_IP}，位置：${USER_ENDPOINT_AREA}"
         fi
     fi
 }
