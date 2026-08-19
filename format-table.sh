@@ -1,6 +1,9 @@
 #!/bin/bash
-# 修改人：猪猪侠
-# Test On: CentOS 7
+#############################################################################
+# Create By: ZZXia
+# License: GNU GPLv3
+# Test On: RockyLinux 9
+#############################################################################
 #
 # 原作者信息如下：
 # https://blog.csdn.net/virnet/article/details/76273512
