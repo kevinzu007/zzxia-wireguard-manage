@@ -9,7 +9,7 @@ setup() {
     source "${SH_DIR}/functions.sh"
 }
 
-@test "F_PARSE_WG_DUMP_LINE 正确解析 dump 数据" {
+@test "F_PARSE_WG_DUMP_LINE 正确解析 IPv4 dump 数据" {
     local line="abc123pubkey== psk123== 1.2.3.4:51820 10.0.0.2/32 1700000000 1048576 2097152 25"
     F_PARSE_WG_DUMP_LINE "${line}"
     [ "${USER_PEER}" = "abc123pubkey==" ]
@@ -17,6 +17,21 @@ setup() {
     [ "${USER_ENDPOINT}" = "1.2.3.4:51820" ]
     [ "${USER_ENDPOINT_IP}" = "1.2.3.4" ]
     [ "${USER_ENDPOINT_UDP_PORT}" = "51820" ]
+    [ "${USER_ALLOWED_IPS}" = "10.0.0.2/32" ]
+    [ "${USER_LATEST_HAND_SECOND}" = "1700000000" ]
+    [ "${USER_NET_IN}" = "1048576" ]
+    [ "${USER_NET_OUT}" = "2097152" ]
+    [ "${USER_KEEPALIVE}" = "25" ]
+}
+
+@test "F_PARSE_WG_DUMP_LINE 正确解析 IPv6 dump 数据" {
+    local line="abc123pubkey== psk123== [2408:8256:c8:1bdd:ab10:372f:19de:115d]:52524 10.0.0.2/32 1700000000 1048576 2097152 25"
+    F_PARSE_WG_DUMP_LINE "${line}"
+    [ "${USER_PEER}" = "abc123pubkey==" ]
+    [ "${USER_PRESHARED_KEY}" = "psk123==" ]
+    [ "${USER_ENDPOINT}" = "[2408:8256:c8:1bdd:ab10:372f:19de:115d]:52524" ]
+    [ "${USER_ENDPOINT_IP}" = "2408:8256:c8:1bdd:ab10:372f:19de:115d" ]
+    [ "${USER_ENDPOINT_UDP_PORT}" = "52524" ]
     [ "${USER_ALLOWED_IPS}" = "10.0.0.2/32" ]
     [ "${USER_LATEST_HAND_SECOND}" = "1700000000" ]
     [ "${USER_NET_IN}" = "1048576" ]

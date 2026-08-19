@@ -40,8 +40,16 @@ F_PARSE_WG_DUMP_LINE()
     USER_PEER=$(echo "${line}" | awk '{print $1}')
     USER_PRESHARED_KEY=$(echo "${line}" | awk '{print $2}')
     USER_ENDPOINT=$(echo "${line}" | awk '{print $3}')
-    USER_ENDPOINT_IP=$(echo "${USER_ENDPOINT}" | cut -d ':' -f 1)
-    USER_ENDPOINT_UDP_PORT=$(echo "${USER_ENDPOINT}" | cut -d ':' -f 2)
+    if [[ "${USER_ENDPOINT}" =~ ^\[([0-9a-fA-F:]+)\]:([0-9]+)$ ]]; then
+        USER_ENDPOINT_IP="${BASH_REMATCH[1]}"
+        USER_ENDPOINT_UDP_PORT="${BASH_REMATCH[2]}"
+    elif [[ "${USER_ENDPOINT}" =~ ^([^:]+):([0-9]+)$ ]]; then
+        USER_ENDPOINT_IP="${BASH_REMATCH[1]}"
+        USER_ENDPOINT_UDP_PORT="${BASH_REMATCH[2]}"
+    else
+        USER_ENDPOINT_IP="${USER_ENDPOINT}"
+        USER_ENDPOINT_UDP_PORT=""
+    fi
     USER_ALLOWED_IPS=$(echo "${line}" | awk '{print $4}')
     USER_LATEST_HAND_SECOND=$(echo "${line}" | awk '{print $5}')
     USER_NET_IN=$(echo "${line}" | awk '{print $6}')
