@@ -69,3 +69,33 @@ F_CALC_MIB()
     USER_NET_OUT_MiB=$(echo "scale=1; ${bytes_out} / 1024 / 1024" | bc -l)
     USER_NET_TOTAL_MiB=$(echo "scale=1; ${USER_NET_IN_MiB} + ${USER_NET_OUT_MiB}" | bc -l)
 }
+
+
+# --- 输入校验 ---
+
+# 用户名合法性校验：拒绝含有 sed/grep 危险字符的用户名
+# 允许：中文、英文字母、数字、下划线、中横线、点
+# 用法：F_VALIDATE_USERNAME "用户名"
+F_VALIDATE_USERNAME()
+{
+    local name="$1"
+    if [ -z "${name}" ]; then
+        echo -e "\n猪猪侠警告：用户名不能为空\n" >&2
+        return 1
+    fi
+    # 拒绝包含 sed/grep/shell 危险字符的用户名：/ \ & * ? [ ] ^ $ . | ( ) { } ! ; ` " ' # 空格 制表符
+    if echo "${name}" | grep -qP '[/\\&*?\[\]^$|(){}!;`"'"'"'#\s]'; then
+        echo -e "\n猪猪侠警告：用户名【${name}】包含非法字符\n" >&2
+        echo -e "允许的字符：中文、英文字母、数字、下划线(_)、中横线(-)、点(.)\n" >&2
+        return 1
+    fi
+    return 0
+}
+
+# 转义 sed 正则中的特殊字符（防御性措施）
+# 用法：escaped=$(F_SED_ESCAPE "字符串")
+F_SED_ESCAPE()
+{
+    printf '%s' "$1" | sed -e 's/[]\/$*.^&[]/\\&/g'
+}
+

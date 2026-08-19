@@ -162,6 +162,7 @@ do
         -a|--add)
             USER_NAME=$2
             shift 2
+            F_VALIDATE_USERNAME "${USER_NAME}" || exit 1
             shift         #--- 去掉'--'
             IP_SUFFIX=$1
             # 是否提供ip尾号
@@ -235,14 +236,16 @@ do
         -r|--rm)
             USER_NAME=$2
             shift 2
+            F_VALIDATE_USERNAME "${USER_NAME}" || exit 1
             # 删除${USER_CONFIG_PATH}目录下用户信息
             rm -f "${USER_CONFIG_PATH}/${USER_NAME}."*
             # 删除wgN.conf中的配置
-            if ! grep -q "## ${USER_NAME} " "${SERVER_CONF_FILE}"; then
+            SAFE_USER_NAME=$(F_SED_ESCAPE "${USER_NAME}")
+            if ! grep -qF "## ${USER_NAME} " "${SERVER_CONF_FILE}"; then
                 echo -e "\n猪猪侠警告：用户【${USER_NAME}】不存在\n"
                 exit 1
             fi
-            sed -i "/^## ${USER_NAME} /,/^ *$/d" "${SERVER_CONF_FILE}"
+            sed -i "/^## ${SAFE_USER_NAME} /,/^ *$/d" "${SERVER_CONF_FILE}"
             # 删除文件末尾的空行
             sed -i ':n;/^\n*$/{N;$d;bn}' "${SERVER_CONF_FILE}"
             F_LOG "INFO" "删除用户：${USER_NAME}"
@@ -252,7 +255,8 @@ do
         -o|--output-config)
             USER_NAME=$2
             shift 2
-            if ! grep -q "## ${USER_NAME} " "${SERVER_CONF_FILE}"; then
+            F_VALIDATE_USERNAME "${USER_NAME}" || exit 1
+            if ! grep -qF "## ${USER_NAME} " "${SERVER_CONF_FILE}"; then
                 echo -e "\n猪猪侠警告：用户【${USER_NAME}】不存在\n"
                 exit 1
             fi

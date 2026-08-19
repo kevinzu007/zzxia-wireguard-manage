@@ -85,3 +85,41 @@ EOF
 
     rm -rf "${SH_PATH}"
 }
+
+@test "F_VALIDATE_USERNAME 接受合法用户名" {
+    run F_VALIDATE_USERNAME "猪猪侠"
+    [ "$status" -eq 0 ]
+    run F_VALIDATE_USERNAME "user_01"
+    [ "$status" -eq 0 ]
+    run F_VALIDATE_USERNAME "test-user"
+    [ "$status" -eq 0 ]
+    run F_VALIDATE_USERNAME "张三"
+    [ "$status" -eq 0 ]
+}
+
+@test "F_VALIDATE_USERNAME 拒绝空用户名" {
+    run F_VALIDATE_USERNAME ""
+    [ "$status" -ne 0 ]
+}
+
+@test "F_VALIDATE_USERNAME 拒绝含危险字符的用户名" {
+    run F_VALIDATE_USERNAME "user/name"
+    [ "$status" -ne 0 ]
+    run F_VALIDATE_USERNAME 'user&name'
+    [ "$status" -ne 0 ]
+    run F_VALIDATE_USERNAME 'user;name'
+    [ "$status" -ne 0 ]
+    run F_VALIDATE_USERNAME 'user name'
+    [ "$status" -ne 0 ]
+    run F_VALIDATE_USERNAME 'user*'
+    [ "$status" -ne 0 ]
+}
+
+@test "F_SED_ESCAPE 正确转义特殊字符" {
+    local result
+    result=$(F_SED_ESCAPE "normal")
+    [ "${result}" = "normal" ]
+    result=$(F_SED_ESCAPE "a.b")
+    [ "${result}" = 'a\.b' ]
+}
+
