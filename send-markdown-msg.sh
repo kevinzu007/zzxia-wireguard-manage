@@ -114,7 +114,7 @@ F_SEND_DINGDING()
     local message="$3"
     
     local send_header="Content-Type: application/json; charset=utf-8"
-    printf -v full_message '### %s\n---\n%s\n\n---\n*发自: %s*  \n*时间: %s*' \
+    printf -v full_message '### %s \n---\n%s \n\n---\n\n*发自: %s*\n\n*时间: %s*\n\n' \
         "${title}" "${message}" "${HOSTNAME}" "${DATETIME}"
     
     if command -v jq > /dev/null 2>&1; then
@@ -139,7 +139,7 @@ F_SEND_WEIXIN()
     local message="$3"
 
     local send_header="Content-Type: application/json; charset=utf-8"
-    printf -v full_message '### %s\n---\n%s\n---\n发自: **%s**\n时间: %s' \
+    printf -v full_message '# %s\n\n---\n\n%s\n\n---\n\n发自: **%s**\n时间: %s' \
         "${title}" "${message}" "${HOSTNAME}" "${DATETIME}"
 
     if command -v jq > /dev/null 2>&1; then
@@ -162,7 +162,7 @@ F_SEND_FEISHU()
     local message="$3"
 
     local send_header="Content-Type: application/json; charset=utf-8"
-    printf -v full_message '### %s\n---\n%s\n---\n发自: **%s**\n时间: %s' \
+    printf -v full_message '## %s\n\n---\n\n%s\n\n---\n\n发自: **%s**\n时间: %s' \
         "${title}" "${message}" "${HOSTNAME}" "${DATETIME}"
 
     if command -v jq > /dev/null 2>&1; then
@@ -262,14 +262,14 @@ if [[ -z ${webhook_url} ]]; then
                     ;;
             esac
         else
-            # 尝试从环境变量中查找可用的webhook URL（过滤占位符）
-            if [[ -n ${DINGDING_WEBHOOK_API} && ${DINGDING_WEBHOOK_API} != *"填上你的token在这里"* ]]; then
+            # 尝试从环境变量中查找可用的webhook URL
+            if [[ -n ${DINGDING_WEBHOOK_API} ]]; then
                 webhook_url=${DINGDING_WEBHOOK_API}
                 platform="dingding"
-            elif [[ -n ${WEIXIN_WEBHOOK_API} && ${WEIXIN_WEBHOOK_API} != *"填上你的token在这里"* ]]; then
+            elif [[ -n ${WEIXIN_WEBHOOK_API} ]]; then
                 webhook_url=${WEIXIN_WEBHOOK_API}
                 platform="weixin"
-            elif [[ -n ${FEISHU_WEBHOOK_API} && ${FEISHU_WEBHOOK_API} != *"填上你的token在这里"* ]]; then
+            elif [[ -n ${FEISHU_WEBHOOK_API} ]]; then
                 webhook_url=${FEISHU_WEBHOOK_API}
                 platform="feishu"
             fi
