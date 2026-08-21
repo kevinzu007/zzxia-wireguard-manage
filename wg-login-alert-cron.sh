@@ -92,8 +92,7 @@ F_SEARCH_USER_NAME()
     do
         N=$(( N + 1 ))
         local F_LINE_USER_NAME
-        F_LINE_USER_NAME=$(echo "$LINE" | cut -d '|' -f 3)
-        F_LINE_USER_NAME=$(echo "${F_LINE_USER_NAME}")
+        F_LINE_USER_NAME=$(echo "$LINE" | awk -F '|' '{print $3}' | awk '{gsub(/^\s+|\s+$/, ""); print}')
         #
         if [[ "${F_USER_NAME}" = "${F_LINE_USER_NAME}" ]]; then
             echo "$N"
