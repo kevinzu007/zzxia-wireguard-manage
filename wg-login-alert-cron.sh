@@ -58,7 +58,7 @@ F_LOGIN_SEND_MSG()
 {
     "${NOTIFICATION_SH}" \
         --title "【Info:wg登录:$(hostname -s)】" \
-        --message "$( echo -e "**用户**：${USER_NAME}\n**最近握手时间**：${USER_LATEST_HAND_SECOND_TIME}\n**WG_IP**：${USER_IP}\n**远程IP**：${USER_ENDPOINT_IP}\n**地理位置**：${USER_ENDPOINT_AREA}" )" 2>/dev/null || true
+        --message "$( echo -e "**用户**：${USER_NAME}  \n**最近握手时间**：${USER_LATEST_HAND_SECOND_TIME}  \n**WG_IP**：${USER_IP}  \n**远程IP**：${USER_ENDPOINT_IP}  \n**地理位置**：${USER_ENDPOINT_AREA}" )" 2>/dev/null || true
 }
 
 # 新IP消息
@@ -66,7 +66,7 @@ F_NEW_IP_SEND_MSG()
 {
     "${NOTIFICATION_SH}" \
         --title "【Info:wg登录:$(hostname -s)】" \
-        --message "$( echo -e "**用户**：${USER_NAME}\n**新远程IP**：${USER_ENDPOINT_IP}\n**地理位置**：${USER_ENDPOINT_AREA}" )" 2>/dev/null || true
+        --message "$( echo -e "**用户**：${USER_NAME}  \n**新远程IP**：${USER_ENDPOINT_IP}  \n**地理位置**：${USER_ENDPOINT_AREA}" )" 2>/dev/null || true
 }
 
 # 离线消息
@@ -74,7 +74,7 @@ F_OFFLINE_SEND_MSG()
 {
     "${NOTIFICATION_SH}" \
         --title "【Info:wg用户离线:$(hostname -s)】" \
-        --message "$( echo -e "**用户**：${USER_NAME}\n**最近握手时间**：${USER_LATEST_HAND_SECOND_TIME}" )" 2>/dev/null || true
+        --message "$( echo -e "**用户**：${USER_NAME}  \n**最近握手时间**：${USER_LATEST_HAND_SECOND_TIME}" )" 2>/dev/null || true
 }
 
 
