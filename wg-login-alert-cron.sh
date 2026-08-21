@@ -88,12 +88,12 @@ F_SEARCH_USER_NAME()
     local F_USER_NAME="$1"
     local N=0      #--- 记录行号
     #
-    while read LINE
+    while read -r LINE
     do
-        (( N++ ))
+        N=$(( N + 1 ))
         local F_LINE_USER_NAME
         F_LINE_USER_NAME=$(echo "$LINE" | cut -d '|' -f 3)
-        F_LINE_USER_NAME=$(echo ${F_LINE_USER_NAME})
+        F_LINE_USER_NAME=$(echo "${F_LINE_USER_NAME}")
         #
         if [[ "${F_USER_NAME}" = "${F_LINE_USER_NAME}" ]]; then
             echo "$N"

@@ -104,8 +104,7 @@ function set_title(){
     for i in "$@"
     do
         title+="|${i}${sep}"
-        #let column_count++
-        (( column_count++ ))
+        column_count=$(( column_count + 1 ))
     done
     title+="|\n"
     seg=$(segmentation)

@@ -65,7 +65,7 @@ do
         echo "| ${YESTERDAY_DATE} | ${USER_NAME} | ${USER_NET_TOTAL_MiB} | ${USER_NET_IN_MiB} | ${USER_NET_OUT_MiB} | ${USER_IP} | ${USER_ENDPOINT_IP} | " >> "${WG_REPORT_FILE}"
 
         # 统计
-        (( TOTAL_ACTIVE_USERS++ ))
+        TOTAL_ACTIVE_USERS=$(( TOTAL_ACTIVE_USERS + 1 ))
         TOTAL_BYTES_IN=$(( TOTAL_BYTES_IN + USER_NET_IN ))
         TOTAL_BYTES_OUT=$(( TOTAL_BYTES_OUT + USER_NET_OUT ))
 
@@ -97,7 +97,7 @@ fi
 F_LOG "INFO" "日报生成完成：${YESTERDAY_WG_REPORT_FILE}"
 
 # 重启wg
-wg-quick down "${WG_IF}"
+wg-quick down "${WG_IF}" 2>/dev/null || true
 wg-quick up "${WG_IF}"
 
 # clean
