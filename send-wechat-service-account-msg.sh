@@ -275,6 +275,9 @@ else
     exit 51
 fi
 
+# 解析转义字符（如 \n, \t 等）
+[ -n "${send_message}" ] && printf -v send_message '%b' "${send_message}"
+
 # 读取环境变量
 WECHAT_APPID=${WECHAT_APPID:-''}
 WECHAT_SECRET=${WECHAT_SECRET:-''}

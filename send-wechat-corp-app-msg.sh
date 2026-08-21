@@ -115,7 +115,7 @@ F_SEND_MSG()
     local url="https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token=${token}"
 
     # 使用 %b 而不是 %s，这样就能自动将输入字符串里的 \n 转换成真正的换行符
-    printf -v content '# %s\n\n---\n\n%b\n\n---\n\n发自: **%s**\n时间: %s' \
+    printf -v content '# %s\n\n---\n\n%b\n\n---\n\n*发自: %s*  \n*时间: %s*' \
         "${title}" "${message}" "${HOSTNAME}" "${DATETIME}"
 
     if command -v jq > /dev/null 2>&1; then
@@ -211,6 +211,10 @@ if [[ -z "${touser}" && -z "${toparty}" && -z "${totag}" ]]; then
     echo -e "\n猪猪侠警告：touser / toparty / totag 三者不能同时为空\n" >&2
     exit 51
 fi
+
+# 解析转义字符（如 \n, \t 等）
+printf -v send_title '%b' "${send_title}"
+printf -v send_message '%b' "${send_message}"
 
 # 读取环境变量
 WECOM_CORP_ID=${WECOM_CORP_ID:-''}

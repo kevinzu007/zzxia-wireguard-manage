@@ -114,7 +114,7 @@ F_SEND_DINGDING()
     local message="$3"
     
     local send_header="Content-Type: application/json; charset=utf-8"
-    printf -v full_message '### %s \n---\n%s \n\n---\n\n*发自: %s*\n\n*时间: %s*\n\n' \
+    printf -v full_message '### %s \n---\n%s \n\n---\n\n*发自: %s*  \n*时间: %s*\n\n' \
         "${title}" "${message}" "${HOSTNAME}" "${DATETIME}"
     
     if command -v jq > /dev/null 2>&1; then
@@ -139,7 +139,7 @@ F_SEND_WEIXIN()
     local message="$3"
 
     local send_header="Content-Type: application/json; charset=utf-8"
-    printf -v full_message '# %s\n\n---\n\n%s\n\n---\n\n*发自: %s*\n\n*时间: %s*' \
+    printf -v full_message '# %s\n\n---\n\n%s\n\n---\n\n*发自: %s*  \n*时间: %s*' \
         "${title}" "${message}" "${HOSTNAME}" "${DATETIME}"
 
     if command -v jq > /dev/null 2>&1; then
@@ -162,7 +162,7 @@ F_SEND_FEISHU()
     local message="$3"
 
     local send_header="Content-Type: application/json; charset=utf-8"
-    printf -v full_message '## %s\n\n---\n\n%s\n\n---\n\n*发自: %s*\n\n*时间: %s*' \
+    printf -v full_message '## %s\n\n---\n\n%s\n\n---\n\n*发自: %s*  \n*时间: %s*' \
         "${title}" "${message}" "${HOSTNAME}" "${DATETIME}"
 
     if command -v jq > /dev/null 2>&1; then
@@ -226,6 +226,10 @@ if [[ -z $send_title || -z $send_message ]]; then
     echo -e "\n猪猪侠警告：参数不足，请查看帮助【$0 --help】\n" >&2
     exit 51
 fi
+
+# 解析转义字符（如 \n, \t 等）
+printf -v send_title '%b' "${send_title}"
+printf -v send_message '%b' "${send_message}"
 
 # 确定webhook URL
 if [[ -z ${webhook_url} ]]; then
