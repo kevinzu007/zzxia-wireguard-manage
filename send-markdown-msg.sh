@@ -139,7 +139,7 @@ F_SEND_WEIXIN()
     local message="$3"
 
     local send_header="Content-Type: application/json; charset=utf-8"
-    printf -v full_message '# %s\n\n---\n\n%s\n\n---\n\n发自: **%s**\n时间: %s' \
+    printf -v full_message '# %s\n\n---\n\n%s\n\n---\n\n发自: **%s**\n\n时间: %s' \
         "${title}" "${message}" "${HOSTNAME}" "${DATETIME}"
 
     if command -v jq > /dev/null 2>&1; then
@@ -162,7 +162,7 @@ F_SEND_FEISHU()
     local message="$3"
 
     local send_header="Content-Type: application/json; charset=utf-8"
-    printf -v full_message '## %s\n\n---\n\n%s\n\n---\n\n发自: **%s**\n时间: %s' \
+    printf -v full_message '## %s\n\n---\n\n%s\n\n---\n\n发自: **%s**\n\n时间: %s' \
         "${title}" "${message}" "${HOSTNAME}" "${DATETIME}"
 
     if command -v jq > /dev/null 2>&1; then
