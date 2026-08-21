@@ -115,7 +115,7 @@ F_SEND_MSG()
     local url="https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token=${token}"
 
     # 使用 %b 而不是 %s，这样就能自动将输入字符串里的 \n 转换成真正的换行符
-    printf -v content '# %s\n\n---\n\n%b\n\n---\n\n*发自: %s*  \n*时间: %s*' \
+    printf -v content '## %s\n---\n\n%b\n\n---\n*发自: %s*  \n*时间: %s*' \
         "${title}" "${message}" "${HOSTNAME}" "${DATETIME}"
 
     if command -v jq > /dev/null 2>&1; then
