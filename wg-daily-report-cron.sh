@@ -46,7 +46,7 @@ sed -i '1d' "${WG_DAILY_STATUS_FILE}"
 
 echo '|日期|用户名|总流量MiB|IN流量MiB|OUT流量MiB|用户IP|远程IP|' > "${YESTERDAY_WG_REPORT_FILE}"
 #
-USER_CARDS=""
+USER_TABLE_ROWS=""
 TOTAL_ACTIVE_USERS=0
 TOTAL_BYTES_IN=0
 TOTAL_BYTES_OUT=0
@@ -69,8 +69,8 @@ do
         TOTAL_BYTES_IN=$(( TOTAL_BYTES_IN + USER_NET_IN ))
         TOTAL_BYTES_OUT=$(( TOTAL_BYTES_OUT + USER_NET_OUT ))
 
-        # 移动端卡片条目
-        USER_CARDS+=$'\n'"👤 **${USER_NAME}** (\`${USER_IP}\`)"$'\n'"- 📶 总流量：**${USER_NET_TOTAL_MiB} MiB**（↓ ${USER_NET_IN_MiB} / ↑ ${USER_NET_OUT_MiB}）"$'\n'"- 🌐 远程IP：\`${USER_ENDPOINT_IP}\`"$'\n'
+        # 表格行数据（四列：用户 | 下行 | 上行 | 总流量）
+        USER_TABLE_ROWS+="| ${USER_NAME} | ${USER_NET_IN_MiB} | ${USER_NET_OUT_MiB} | ${USER_NET_TOTAL_MiB} |\n"
     fi
 done < "${WG_DAILY_STATUS_FILE}"
 #
@@ -85,12 +85,12 @@ else
     TOTAL_ALL_OUT_MIB=$(echo "scale=1; ${TOTAL_BYTES_OUT} / 1024 / 1024" | bc -l)
     TOTAL_ALL_MIB=$(echo "scale=1; ${TOTAL_ALL_IN_MIB} + ${TOTAL_ALL_OUT_MIB}" | bc -l)
 
-    MSG_BODY="### 📊 昨日流量明细：${USER_CARDS}"$'\n\n'"---"$'\n'"📌 **汇总统计**：共 **${TOTAL_ACTIVE_USERS}** 位活跃用户，累计流量 **${TOTAL_ALL_MIB} MiB**（↓ ${TOTAL_ALL_IN_MIB} / ↑ ${TOTAL_ALL_OUT_MIB}）"
+    MSG_BODY="📌 **汇总统计**：共 **${TOTAL_ACTIVE_USERS}** 位活跃用户，累计 **${TOTAL_ALL_MIB} MB**（↓ ${TOTAL_ALL_IN_MIB} / ↑ ${TOTAL_ALL_OUT_MIB}）\n\n| 用户 | 下行(MB) | 上行(MB) | 总流量(MB) |\n| :--- | :--- | :--- | :--- |\n${USER_TABLE_ROWS}"
 fi
 
 if [ -f "${NOTIFICATION_SH}" ]; then
     "${NOTIFICATION_SH}" \
-        --title "【WireGuard流量日报:$(hostname -s)】${YESTERDAY_DATE}" \
+        --title "【WG日报:$(hostname -s)】" \
         --message "${MSG_BODY}" >/dev/null 2>&1 || true
 fi
 
